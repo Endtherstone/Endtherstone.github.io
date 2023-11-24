@@ -34,4 +34,7 @@ p {
   color: black;
 }
 .head {
-    text-align: left;}
+    text-align: center;
+      overflow: hidden;
+  background-color: #333;
+}
