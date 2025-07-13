@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Endtherstone</title>
+<meta name="description" content="แจกแมพ Minecraft ประเทศไทย พร้อมดาวน์โหลด และเข้าร่วมเซิร์ฟเวอร์สุดมันส์ อัพเดทถ้าเครื่องแรง!">
+<link rel="icon" href="logo.png" type="image/x-icon">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body {
+  margin:0; background:#121212; color:#eee;
+  font-family: 'Noto Sans', sans-serif; font-size:18px;
+}
+nav.navbar {
+  background:#000; display:flex; justify-content:space-between;
+  align-items:center; padding:15px 30px;
+}
+nav.navbar a {
+  color:#eee; text-decoration:none; margin-left:20px;
+  font-family: 'Press Start 2P', cursive; font-size:1rem;
+}
+.navbar .buy {
+  background:#4caf50; color:#000; padding:8px 16px; font-size:1rem;
+}
+.hero {
+  position:relative; height:400px; overflow:hidden;
+}
+/* ใช้ a ครอบทั้ง hero-slide เพื่อให้กดได้ */
+.hero-slide {
+  position:absolute; top:0; left:0; right:0; bottom:0;
+  background-size:cover; background-position:center;
+  opacity:0; transition:opacity 1s;
+  text-decoration:none; /* ลบขีดเส้นใต้ลิงก์ */
+  color:inherit;
+}
+.hero-slide.active { opacity:1; }
+.hero::after {
+  content:""; position:absolute; inset:0; background:rgba(0,0,0,0.2);
+}
+.hero-content {
+  position:relative; text-align:center; top:45%;
+  z-index:1; /* ให้ข้อความอยู่บน overlay */
+}
+.hero-content h1 {
+  font-size:2rem; font-weight:bold;
+  font-family: 'Press Start 2P', cursive;
+  margin:0;
+}
+.hero-content .hero-button {
+  display:inline-block; margin-top:15px; background:#4caf50;
+  color:#000; padding:10px 24px; text-decoration:none;
+  font-size:1rem; font-family: 'Press Start 2P', cursive;
+}
+.section-container {
+  margin:40px 20px;
+}
+.section-header {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:10px;
+}
+.section-title {
+  font-family: 'Press Start 2P', cursive;
+  font-size:1.6rem; color:#4caf50; text-decoration:none;
+  font-weight:bold;
+}
+.carousel-controls button {
+  background:none; border:none; color:#4caf50;
+  font-size:2rem; cursor:pointer; margin-left:8px;
+}
+.carousel {
+  display:flex; align-items:center;
+}
+.carousel-inner {
+  display:flex; overflow:hidden; transition: transform 0.5s;
+}
+.carousel-item {
+  display:block; min-width:250px; margin-right:15px; background:#222;
+  color:#fff; text-align:center; text-decoration:none;
+  border-radius:8px; overflow:hidden;
+}
+.carousel-item img {
+  width:100%; height:160px; object-fit:cover;
+}
+.carousel-item p {
+  font-size:0.9rem; padding:8px;
+}
+footer {
+  text-align:center; font-size:0.8rem; padding:20px; background:#000;
+}
+footer .social svg {
+  fill:#4caf50; margin:0 8px;
+}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div>
+    <a href="#">Endtherstone</a>
+    <a href="mmthd.html">แผนที่</a>
+    <a href="minecraft://?addExternalServer=Endtherserver|edok.duckdns.org:19132">เข้าร่วมเซิร์ฟเวอร์</a>
+  </div>
+  <a href="https://discord.com/invite/legacycraft" class="buy">สนับสนุนเรา</a>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <!-- ใช้ <a> ครอบ slide ทั้งอัน -->
+  <a href="mmthd.html" class="hero-slide active" style="background-image:url('hero1.jpg');">
+    <div class="hero-content">
+      <h1>แมพประเทศไทย</h1>
+      <div class="hero-button">ดาวน์โหลด</div>
+    </div>
+  </a>
+  <a href="minecraft://?addExternalServer=Endtherserver|edok.duckdns.org:19132" class="hero-slide" style="background-image:url('hero2.jpg');">
+    <div class="hero-content">
+      <h1>เข้าร่วม Server</h1>
+      <div class="hero-button">เข้าร่วม</div>
+    </div>
+  </a>
+</section>
+
+<!-- คุณอาจสนใจ -->
+<section class="section-container">
+  <div class="section-header">
+    <a class="section-title" href="updates.html">คุณอาจสนใจ</a>
+    <div class="carousel-controls">
+      <button onclick="move(-1)" aria-label="เลื่อนไปซ้าย">&#9664;</button>
+      <button onclick="move(1)" aria-label="เลื่อนไปขวา">&#9654;</button>
+    </div>
+  </div>
+
+  <div class="carousel">
+    <div class="carousel-inner" id="carouselInner">
+      <a class="carousel-item" href="https://youtu.be/CgCVZdcKcqY?si=rUKLY0TZ3HA_-PQW"><img src="https://en.sportschosun.com/images/2025/07/05/title-of-blackpinks-new-song-is-jump-83544/title-of-blackpinks-new-song-is-jump-8354403.jpg" alt="อัพเดทแมพ"><p>jump blackpink</p></a>
+      <a class="carousel-item" href="https://aternos.org/"><img src="https://avatars.githubusercontent.com/u/10004025?s=280&v=4" alt="กิจกรรมใหม่"><p>บริการเซิร์ฟเวอร์มายคราฟฟรี</p></a>
+      <a class="carousel-item" href="https://chatgpt.com"><img src="https://play-lh.googleusercontent.com/lmG9HlI0awHie0cyBieWXeNjpyXvHPwDBb8MNOVIyp0P8VEh95AiBHtUZSDVR3HLe3A=w240-h480-rw" alt="ของรางวัลพิเศษ"><p>ai แสนจะฉลาด</p></a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div>FOLLOW US 
+    <a href="https://www.tiktok.com/@endtherstone"><svg height="20" viewBox="0 0 24 24"><path d="M22 12a10..."/></svg></a>
+  </div>
+  &copy; 2025 Endtherstone | web by ChatGPT
+</footer>
+
+<!-- Script -->
+<script>
+// Hero auto slide
+let slides = document.querySelectorAll('.hero-slide');
+let i = 0;
+setInterval(() => {
+  slides[i].classList.remove('active');
+  i = (i + 1) % slides.length;
+  slides[i].classList.add('active');
+}, 5000);
+
+// Carousel move
+let pos = 0;
+function move(dir) {
+  const c = document.getElementById('carouselInner');
+  const containerWidth = c.parentElement.offsetWidth;
+  const contentWidth = c.scrollWidth;
+  const itemWidth = 265;
+  pos += dir * itemWidth;
+  if(pos < 0) pos = 0;
+  if(pos > contentWidth - containerWidth) pos = contentWidth - containerWidth;
+  c.style.transform = `translateX(-${pos}px)`;
+}
+</script>
+</body>
+</html>
