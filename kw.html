@@ -1,0 +1,58 @@
+<script>
+// ฟังก์ชันจัดการคุกกี้
+function setCookie(name, value, days) {
+  const d = new Date();
+  d.setTime(d.getTime() + (days*24*60*60*1000));
+  document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/`;
+}
+
+function getCookie(name) {
+  const cname = name + "=";
+  const decoded = decodeURIComponent(document.cookie);
+  const ca = decoded.split(';');
+  for(let c of ca) {
+    while(c.charAt(0)==' ') c = c.substring(1);
+    if(c.indexOf(cname) == 0) return c.substring(cname.length,c.length);
+  }
+  return "";
+}
+
+// ตรวจสอบว่าผู้เล่นเคยเล่นแล้ว
+window.onload = () => {
+  const prevScore = getCookie("techQuizScore");
+  if(prevScore) {
+    alert(`คุณเคยเล่นเกมนี้แล้ว! คะแนนสูงสุดที่บันทึกไว้: ${prevScore} / 10`);
+  }
+  startGame();
+};
+
+function checkAnswer(selected){
+  const q = questions[currentQuestion];
+  const feedback = document.getElementById('feedback');
+  if(selected === q.correct){
+    feedback.textContent = "✅ ถูกต้อง!";
+    feedback.style.color = "green";
+    score++;
+  } else {
+    feedback.textContent = "❌ ผิด!";
+    feedback.style.color = "red";
+  }
+  document.getElementById('score').textContent = `คะแนน: ${score} / ${questions.length}`;
+  setTimeout(()=>{
+    currentQuestion++;
+    if(currentQuestion<questions.length){
+      loadQuestion();
+    }else{
+      feedback.textContent = `🎉 จบเกม! คะแนนสุดท้าย: ${score} / ${questions.length}`;
+      document.getElementById('answers').innerHTML = '';
+      
+      // บันทึกคะแนนสูงสุดลงคุกกี้ (เก็บ 30 วัน)
+      const prevScore = getCookie("techQuizScore");
+      if(!prevScore || score > parseInt(prevScore)){
+        setCookie("techQuizScore", score, 30);
+        alert(`บันทึกคะแนนสูงสุดแล้ว: ${score} / ${questions.length}`);
+      }
+    }
+  },1200);
+}
+</script>
