@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.25);
+            --glass-bg: rgba(255, 255, 255, 0.15); /* ลดความทึบลงเพื่อให้เห็นพื้นหลังชัดขึ้น */
             --glass-border: rgba(255, 255, 255, 0.4);
             --text-main: #1d1d1f;
             --text-muted: #424245;
@@ -31,6 +31,8 @@
             align-items: center;
             padding: 20px;
             overflow-x: hidden;
+            /* เพิ่ม perspective ให้หน้าจอทั้งหมดเพื่อให้เอฟเฟกต์ 3D ชัดเจนที่สุด */
+            perspective: 1200px; 
         }
 
         @keyframes gradientBG {
@@ -39,22 +41,53 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* การ์ดหลัก พร้อมรองรับ 3D Tilt */
+        /* -------------------------------------------
+           💎 จำลองความหนาของกระจกและการหักเห (Refraction)
+           ------------------------------------------- */
         .glass-card {
             background: var(--glass-bg);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border: 1px solid var(--glass-border);
+            /* เพิ่ม saturate(150%) brightness(110%) เพื่อบิดเบือนสีแสงที่ลอดผ่านให้ดูคล้ายการสะท้อนของของเหลว/เนื้อแก้ว */
+            backdrop-filter: blur(30px) saturate(150%) brightness(110%);
+            -webkit-backdrop-filter: blur(30px) saturate(150%) brightness(110%);
             border-radius: 40px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 
-                        inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+            /* Fresnel Effect - ขอบกระจกจะมีความเงาตามความหนา (Inner Glow + Drop Shadow) */
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15), 
+                        inset 0 0 0 1px rgba(255, 255, 255, 0.4),
+                        inset 0 10px 20px rgba(255, 255, 255, 0.3), /* แสงตกขอบบน */
+                        inset 0 -10px 20px rgba(0, 0, 0, 0.05);     /* เงาสะท้อนลึกด้านล่าง */
             padding: 40px 30px;
             width: 100%;
             max-width: 400px;
             text-align: center;
             position: relative;
             transform-style: preserve-3d; 
-            transition: transform 0.1s;
+            transition: transform 0.1s ease-out;
+            overflow: hidden; /* กักเก็บแสง Environment ไม่ให้ทะลุกรอบ */
+            /* จัดเก็บตัวแปรที่รับมาจาก JS เพื่อทำ Gradient */
+            --shimmer-x: 50%;
+            --shimmer-y: 50%;
+        }
+
+        /* 🌟 แสงสะท้อนบนพื้นผิวที่วิ่งแบบสมจริง (Global Shimmer) 🌟 */
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle 800px at var(--shimmer-x) var(--shimmer-y), 
+                                        rgba(255, 255, 255, 0.4) 0%, 
+                                        rgba(255, 255, 255, 0) 60%);
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: overlay; /* ผสมแสงให้เข้ากับพื้นหลัง */
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        /* เอาไว้ให้ส่วนของ Content ทะลุขึ้นมาอยู่เหนือแสง */
+        .card-content {
+            position: relative;
+            z-index: 10;
+            transform-style: preserve-3d;
         }
 
         .share-btn {
@@ -62,20 +95,20 @@
             top: 25px;
             right: 25px;
             background: rgba(255, 255, 255, 0.5);
-            border: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
             width: 40px;
             height: 40px;
             border-radius: 50%;
             cursor: pointer;
             backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-            transform: translateZ(20px); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05), inset 0 2px 5px rgba(255,255,255,0.8);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transform: translateZ(40px); /* ลอยออกจากตัวการ์ด */
         }
         
         .share-btn:hover {
-            background: #fff;
-            transform: translateZ(20px) scale(1.1);
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateZ(50px) scale(1.1); /* เด้งเข้าหาตาผู้มอง */
         }
 
         .profile-pic {
@@ -84,17 +117,18 @@
             border-radius: 50%;
             object-fit: cover;
             border: 4px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15), inset 0 0 10px rgba(0,0,0,0.2);
             margin-bottom: 20px;
-            transform: translateZ(30px); 
+            transform: translateZ(60px); 
         }
 
         h1 {
             font-size: 1.8rem;
             font-weight: 700;
             color: var(--text-main);
-            transform: translateZ(20px);
+            transform: translateZ(30px);
             letter-spacing: -0.5px;
+            text-shadow: 0 2px 5px rgba(255,255,255,0.5);
         }
 
         p.bio {
@@ -127,13 +161,13 @@
         }
 
         /* -------------------------------------
-           ✨ iPadOS Spotlight Button Effect ✨
+           iPadOS Spotlight Button (ปรับให้กลมกลืน)
            ------------------------------------- */
         .glass-btn {
             text-decoration: none;
             color: var(--text-main);
             background: rgba(255, 255, 255, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.4);
             padding: 18px 20px;
             border-radius: 20px;
             font-size: 1rem;
@@ -143,15 +177,15 @@
             justify-content: space-between;
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             position: relative;
-            overflow: hidden; /* สำคัญ: ไม่ให้แสงล้นขอบปุ่ม */
+            overflow: hidden; 
+            transform: translateZ(30px); /* ให้ปุ่มลอยขึ้นจากกระจกชั้นแรก */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
         }
 
-        /* แสงฟุ้งๆ ที่จะวิ่งตามเคอร์เซอร์ */
         .glass-btn::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            /* สร้างจุดแสงโดยใช้ตำแหน่ง --x และ --y จาก Javascript */
             background: radial-gradient(circle 80px at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, 0.9), transparent 100%);
             opacity: 0;
             transition: opacity 0.3s;
@@ -159,7 +193,6 @@
             z-index: 0;
         }
 
-        /* ดันเนื้อหาในปุ่มให้อยู่เหนือแสง */
         .glass-btn > * {
             position: relative;
             z-index: 1;
@@ -171,87 +204,73 @@
             gap: 15px;
         }
 
-        .glass-btn i {
-            font-size: 1.4rem;
-        }
-
-        .glass-btn .fa-chevron-right {
-            font-size: 0.8rem;
-            opacity: 0.5;
-            transition: all 0.3s;
-        }
-
+        .glass-btn i { font-size: 1.4rem; }
+        .glass-btn .fa-chevron-right { font-size: 0.8rem; opacity: 0.5; transition: all 0.3s; }
         .fa-facebook { color: #1877F2; }
         .fa-tiktok { color: #000000; }
         .fa-bag-shopping { color: #FF2D55; }
 
-        /* เมื่อเอาเมาส์ชี้ปุ่ม */
         .glass-btn:hover {
             border-color: rgba(255, 255, 255, 0.9);
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.5), 
-                        0 5px 15px rgba(0, 0, 0, 0.05);
+            transform: translateZ(40px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 
+                        inset 0 0 10px rgba(255, 255, 255, 0.5);
         }
 
-        /* แสดงแสงเมื่อ Hover */
-        .glass-btn:hover::before {
-            opacity: 1;
-        }
-
-        .glass-btn:hover .fa-chevron-right {
-            opacity: 1;
-            transform: translateX(5px);
-        }
+        .glass-btn:hover::before { opacity: 1; }
+        .glass-btn:hover .fa-chevron-right { opacity: 1; transform: translateX(5px); }
 
     </style>
 </head>
 <body>
 
-    <div class="glass-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.5">
+    <div class="glass-card" data-tilt data-tilt-max="15" data-tilt-speed="600" data-tilt-perspective="1000">
         
-        <button class="share-btn" id="shareBtn" title="แชร์นามบัตร">
-            <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        </button>
+        <div class="card-content">
+            <button class="share-btn" id="shareBtn" title="แชร์นามบัตร">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </button>
 
-        <img src="https://i.pravatar.cc/300" alt="Profile" class="profile-pic">
-        <h1>[ชื่อของคุณ]</h1>
-        <p class="bio">🎓 Congratulation to me! | สแกนแล้วก็แอดมาด้วยนะ</p>
+            <img src="https://i.pravatar.cc/300" alt="Profile" class="profile-pic">
+            <h1>[ชื่อของคุณ]</h1>
+            <p class="bio">🎓 Congratulation to me! | สแกนแล้วก็แอดมาด้วยนะ</p>
 
-        <div class="link-group">
-            <h2 class="group-title">Contact & Social</h2>
-            <div class="links-container">
-                
-                <a href="https://facebook.com/yourprofile" target="_blank" class="glass-btn">
-                    <div class="btn-content">
-                        <i class="fa-brands fa-facebook"></i>
-                        <span>แอดเพื่อนเฟสบุ๊ค</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
+            <div class="link-group">
+                <h2 class="group-title">Contact & Social</h2>
+                <div class="links-container">
+                    
+                    <a href="https://facebook.com/yourprofile" target="_blank" class="glass-btn">
+                        <div class="btn-content">
+                            <i class="fa-brands fa-facebook"></i>
+                            <span>แอดเพื่อนเฟสบุ๊ค</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
 
-                <a href="https://tiktok.com/@yourprofile" target="_blank" class="glass-btn">
-                    <div class="btn-content">
-                        <i class="fa-brands fa-tiktok"></i>
-                        <span>ส่อง TikTok เราหน่อย</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
+                    <a href="https://tiktok.com/@yourprofile" target="_blank" class="glass-btn">
+                        <div class="btn-content">
+                            <i class="fa-brands fa-tiktok"></i>
+                            <span>ส่อง TikTok เราหน่อย</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
 
+                </div>
             </div>
-        </div>
 
-        <div class="link-group">
-            <h2 class="group-title">Support Me</h2>
-            <div class="links-container">
-                
-                <a href="https://your-affiliate-link.com" target="_blank" class="glass-btn">
-                    <div class="btn-content">
-                        <i class="fa-solid fa-bag-shopping"></i>
-                        <span>อุดหนุนของ (เค้าได้ค่าคอม!)</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
+            <div class="link-group">
+                <h2 class="group-title">Support Me</h2>
+                <div class="links-container">
+                    
+                    <a href="https://your-affiliate-link.com" target="_blank" class="glass-btn">
+                        <div class="btn-content">
+                            <i class="fa-solid fa-bag-shopping"></i>
+                            <span>อุดหนุนของ (เค้าได้ค่าคอม!)</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
 
+                </div>
             </div>
         </div>
     </div>
@@ -277,18 +296,38 @@
             }
         });
 
-        // ✨ Script สำหรับทำแสงวิ่งตามเมาส์แบบ iPadOS ✨
+        // ✨ 1. Spotlight บนปุ่มแบบ iPadOS
         document.querySelectorAll('.glass-btn').forEach(btn => {
             btn.addEventListener('mousemove', e => {
                 const rect = btn.getBoundingClientRect();
-                // คำนวณหาตำแหน่งแกน X และ Y ของเมาส์เทียบกับขอบเขตของปุ่ม
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
-                // ส่งค่าพิกัดไปให้ CSS ตัวแปร --x และ --y
                 btn.style.setProperty('--x', `${x}px`);
                 btn.style.setProperty('--y', `${y}px`);
             });
         });
+
+        // ✨ 2. ระบบคำนวณทิศทางแสงสะท้อนของกระจก (Global Shimmer & Reflection)
+        const card = document.querySelector('.glass-card');
+        
+        // ฟังการขยับเมาส์บนหน้าจอทั้งหมด เพื่อจำลองว่าแสงวิ่งมาจากทางไหน
+        document.addEventListener('mousemove', (e) => {
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+            
+            // หาขนาดและตำแหน่งของการ์ด
+            const cardRect = card.getBoundingClientRect();
+            
+            // คำนวณเปอร์เซ็นต์ว่าเมาส์อยู่ตรงไหนของพื้นที่การ์ด
+            // ลบด้วย offset ให้จุดกำเนิดแสงอยู่นอกขอบการ์ดได้ ทำให้การกวาดแสงดูกว้างและสมจริงขึ้น
+            const percentX = ((mouseX - cardRect.left) / cardRect.width) * 100;
+            const percentY = ((mouseY - cardRect.top) / cardRect.height) * 100;
+
+            // ส่งพิกัดเปอรเซ็นต์ไปที่ตัวแปร CSS บน .glass-card เพื่อทำ Gradient วิ่งสะท้อน
+            card.style.setProperty('--shimmer-x', `${percentX}%`);
+            card.style.setProperty('--shimmer-y', `${percentY}%`);
+        });
+
     </script>
 
 </body>
