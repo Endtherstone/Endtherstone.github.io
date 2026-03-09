@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Space | ปัจฉิมนิเทศ</title>
+    <title>Peerapat Lairin m.6/1 | ปัจฉิมนิเทศ</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            /* ปรับให้กระจกใสขึ้นอีกนิดเพื่อให้เห็นแสงข้างหลังชัดๆ */
-            --glass-bg: rgba(255, 255, 255, 0.08); 
+            --glass-bg: rgba(255, 255, 255, 0.25);
             --glass-border: rgba(255, 255, 255, 0.4);
             --text-main: #1d1d1f;
             --text-muted: #424245;
@@ -22,135 +21,62 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* พื้นหลังขยับได้ (Animated Gradient) */
         body {
-            /* ปรับสีพื้นหลังให้เข้มขึ้นเล็กน้อยเพื่อให้แสงและกระจกโดดเด่นขึ้น */
-            background-color: #f2f2f7; 
+            background: linear-gradient(-45deg, #fbc2eb, #a6c1ee, #ffecd2, #fcb69f);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
             overflow-x: hidden;
-            perspective: 1200px; 
-            position: relative;
         }
 
-        /* -------------------------------------------
-           ✨ เพิ่มดวงไฟเคลื่อนไหวเป็น Background ด้านหลัง (เคล็ดลับกระจกเล่นแสง)
-           ------------------------------------------- */
-        .ambient-lights {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: 0; /* ให้อยู่หลังสุด */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        .light-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px); /* เบลอขอบให้ฟุ้งเป็นแสง */
-            opacity: 0.8;
-            animation: float 12s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95);
-        }
-
-        .orb-1 {
-            width: 40vw; height: 40vw;
-            background: #ff9a9e; /* สีชมพูพีช */
-            top: -10%; left: -10%;
-        }
-
-        .orb-2 {
-            width: 35vw; height: 35vw;
-            background: #a18cd1; /* สีม่วงพาสเทล */
-            bottom: -10%; right: -5%;
-            animation-delay: -3s;
-        }
-
-        .orb-3 {
-            width: 30vw; height: 30vw;
-            background: #fecfef; /* สีชมพูอ่อน */
-            top: 40%; left: 40%;
-            animation-delay: -6s;
-        }
-
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(10vw, 5vh) scale(1.2); }
-            100% { transform: translate(-5vw, 15vh) scale(0.9); }
-        }
-
-        /* -------------------------------------------
-           💎 จำลองความหนาของกระจกและการหักเห (Refraction)
-           ------------------------------------------- */
+        /* การ์ดหลัก พร้อมรองรับ 3D Tilt */
         .glass-card {
             background: var(--glass-bg);
-            /* พระเอกของการทำกระจก: ดึงสีแสงด้านหลังมาขยายความสว่างและความสด */
-            backdrop-filter: blur(25px) saturate(200%) brightness(110%);
-            -webkit-backdrop-filter: blur(25px) saturate(200%) brightness(110%);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
             border-radius: 40px;
-            /* ขอบกระจก 3 มิติ */
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1), 
-                        inset 0 10px 20px rgba(255, 255, 255, 0.4); /* แสงตกขอบบนสมจริงขึ้น */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 
+                        inset 0 0 0 1px rgba(255, 255, 255, 0.5);
             padding: 40px 30px;
             width: 100%;
             max-width: 400px;
             text-align: center;
             position: relative;
-            transform-style: preserve-3d; 
-            transition: transform 0.1s ease-out;
-            overflow: hidden; 
-            z-index: 10; /* ให้อยู่เหนือแสง */
-            --shimmer-x: 50%;
-            --shimmer-y: 50%;
+            transform-style: preserve-3d; /* สำหรับ 3D */
+            transition: transform 0.1s;
         }
 
-        /* 🌟 แสงสะท้อนบนพื้นผิวที่วิ่งแบบสมจริง (Global Shimmer) 🌟 */
-        .glass-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle 600px at var(--shimmer-x) var(--shimmer-y), 
-                                        rgba(255, 255, 255, 0.6) 0%, 
-                                        rgba(255, 255, 255, 0) 50%);
-            pointer-events: none;
-            z-index: 0;
-            mix-blend-mode: overlay;
-            opacity: 0.9;
-            transition: opacity 0.3s;
-        }
-
-        .card-content {
-            position: relative;
-            z-index: 10;
-            transform-style: preserve-3d;
-        }
-
+        /* ปุ่มแชร์มุมขวาบน */
         .share-btn {
             position: absolute;
             top: 25px;
             right: 25px;
-            background: rgba(255, 255, 255, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.5);
+            border: none;
             width: 40px;
             height: 40px;
             border-radius: 50%;
             cursor: pointer;
             backdrop-filter: blur(10px);
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            transform: translateZ(40px); 
+            transition: all 0.3s ease;
+            transform: translateZ(20px); /* 3D effect */
         }
-        
         .share-btn:hover {
-            background: rgba(255, 255, 255, 0.9);
-            transform: translateZ(50px) scale(1.1); 
+            background: #fff;
+            transform: translateZ(20px) scale(1.1);
         }
 
         .profile-pic {
@@ -158,17 +84,17 @@
             height: 120px;
             border-radius: 50%;
             object-fit: cover;
-            border: 4px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: 4px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
             margin-bottom: 20px;
-            transform: translateZ(60px); 
+            transform: translateZ(30px); /* 3D เด้งออกมา */
         }
 
         h1 {
             font-size: 1.8rem;
             font-weight: 700;
             color: var(--text-main);
-            transform: translateZ(30px);
+            transform: translateZ(20px);
             letter-spacing: -0.5px;
         }
 
@@ -177,7 +103,6 @@
             color: var(--text-muted);
             margin-top: 8px;
             transform: translateZ(20px);
-            font-weight: 500;
         }
 
         .link-group {
@@ -190,7 +115,7 @@
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 2px;
-            color: rgba(0, 0, 0, 0.5);
+            color: var(--text-muted);
             margin-bottom: 12px;
             padding-left: 10px;
             font-weight: 700;
@@ -202,14 +127,12 @@
             gap: 15px;
         }
 
-        /* -------------------------------------
-           iPadOS Spotlight Button
-           ------------------------------------- */
+        /* ดีไซน์ปุ่มแบบ Advanced */
         .glass-btn {
             text-decoration: none;
             color: var(--text-main);
-            background: rgba(255, 255, 255, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.6);
             padding: 18px 20px;
             border-radius: 20px;
             font-size: 1rem;
@@ -219,26 +142,7 @@
             justify-content: space-between;
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             position: relative;
-            overflow: hidden; 
-            transform: translateZ(30px); 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-            backdrop-filter: blur(5px);
-        }
-
-        .glass-btn::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle 80px at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, 0.9), transparent 100%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .glass-btn > * {
-            position: relative;
-            z-index: 1;
+            overflow: hidden;
         }
 
         .btn-content {
@@ -247,78 +151,84 @@
             gap: 15px;
         }
 
-        .glass-btn i { font-size: 1.4rem; }
-        .glass-btn .fa-chevron-right { font-size: 0.8rem; opacity: 0.5; transition: all 0.3s; }
+        .glass-btn i {
+            font-size: 1.4rem;
+        }
+
+        /* ไอคอนลูกศรด้านขวา */
+        .glass-btn .fa-chevron-right {
+            font-size: 0.8rem;
+            opacity: 0.5;
+            transition: all 0.3s;
+        }
+
+        /* สีไอคอนเฉพาะ */
         .fa-facebook { color: #1877F2; }
         .fa-tiktok { color: #000000; }
         .fa-bag-shopping { color: #FF2D55; }
 
+        /* Hover Effect มีแสงวาบ */
         .glass-btn:hover {
-            border-color: rgba(255, 255, 255, 0.9);
-            transform: translateZ(40px) scale(1.02);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.8);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.5), 
+                        0 5px 15px rgba(0, 0, 0, 0.05);
         }
 
-        .glass-btn:hover::before { opacity: 1; }
-        .glass-btn:hover .fa-chevron-right { opacity: 1; transform: translateX(5px); }
+        .glass-btn:hover .fa-chevron-right {
+            opacity: 1;
+            transform: translateX(5px);
+        }
 
     </style>
 </head>
 <body>
 
-    <div class="ambient-lights">
-        <div class="light-orb orb-1"></div>
-        <div class="light-orb orb-2"></div>
-        <div class="light-orb orb-3"></div>
-    </div>
-
-    <div class="glass-card" data-tilt data-tilt-max="15" data-tilt-speed="600" data-tilt-perspective="1000">
+    <div class="glass-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2">
         
-        <div class="card-content">
-            <button class="share-btn" id="shareBtn" title="แชร์นามบัตร">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            </button>
+        <button class="share-btn" id="shareBtn" title="แชร์นามบัตร">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        </button>
 
-            <img src="https://i.pravatar.cc/300" alt="Profile" class="profile-pic">
-            <h1>[ชื่อของคุณ]</h1>
-            <p class="bio">🎓 Congratulation to me! | สแกนแล้วก็แอดมาด้วยนะ</p>
+        <img src="icon.png" alt="Profile" class="profile-pic">
+        <h1>Peerapat Lairin</h1>
+        <p class="bio">🎓 Congratulation to me! | สแกนแล้วก็แอดมาด้วยนะ</p>
 
-            <div class="link-group">
-                <h2 class="group-title">Contact & Social</h2>
-                <div class="links-container">
-                    
-                    <a href="https://facebook.com/yourprofile" target="_blank" class="glass-btn">
-                        <div class="btn-content">
-                            <i class="fa-brands fa-facebook"></i>
-                            <span>แอดเพื่อนเฟสบุ๊ค</span>
-                        </div>
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </a>
+        <div class="link-group">
+            <h2 class="group-title">Contact & Social</h2>
+            <div class="links-container">
+                
+                <a href="https://www.facebook.com/peerapat.lairin?" target="_blank" class="glass-btn">
+                    <div class="btn-content">
+                        <i class="fa-brands fa-facebook"></i>
+                        <span>แอดเพื่อนเฟสบุ๊ค</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
 
-                    <a href="https://tiktok.com/@yourprofile" target="_blank" class="glass-btn">
-                        <div class="btn-content">
-                            <i class="fa-brands fa-tiktok"></i>
-                            <span>ส่อง TikTok เราหน่อย</span>
-                        </div>
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </a>
+                <a href="https://tiktok.com/@endtherstone" target="_blank" class="glass-btn">
+                    <div class="btn-content">
+                        <i class="fa-brands fa-tiktok"></i>
+                        <span>ส่อง TikTok เราหน่อย</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
 
-                </div>
             </div>
+        </div>
 
-            <div class="link-group">
-                <h2 class="group-title">Support Me</h2>
-                <div class="links-container">
-                    
-                    <a href="https://your-affiliate-link.com" target="_blank" class="glass-btn">
-                        <div class="btn-content">
-                            <i class="fa-solid fa-bag-shopping"></i>
-                            <span>อุดหนุนของ (เค้าได้ค่าคอม!)</span>
-                        </div>
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </a>
+        <div class="link-group">
+            <h2 class="group-title">Support Me</h2>
+            <div class="links-container">
+                
+                <a href="https://vt.tiktok.com/ZS9d9SoFDBau2-X3xhW/" target="_blank" class="glass-btn">
+                    <div class="btn-content">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <span>อุดหนุนของ (เค้าได้ค่าคอม!)</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
 
-                </div>
             </div>
         </div>
     </div>
@@ -326,12 +236,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
     
     <script>
-        // ระบบแชร์
         document.getElementById('shareBtn').addEventListener('click', async () => {
             if (navigator.share) {
                 try {
                     await navigator.share({
-                        title: 'นามบัตรดิจิทัลของฉัน',
+                        title: 'นามบัตรของคนเก๋สุดในก.ว.',
                         text: 'แก สแกนอันนี้แล้วแอดมา หรือช่วยกดซื้อของให้หน่อยนะ!',
                         url: window.location.href
                     });
@@ -339,39 +248,13 @@
                     console.log('User cancelled share');
                 }
             } else {
+                // ถ้าเบราว์เซอร์ไม่รองรับ ให้กดก๊อปปี้ลิงก์แทน
                 navigator.clipboard.writeText(window.location.href);
                 alert("ก๊อปปี้ลิงก์เรียบร้อยแล้ว! ส่งให้เพื่อนได้เลย");
             }
         });
-
-        // ✨ 1. Spotlight บนปุ่มแบบ iPadOS
-        document.querySelectorAll('.glass-btn').forEach(btn => {
-            btn.addEventListener('mousemove', e => {
-                const rect = btn.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                btn.style.setProperty('--x', `${x}px`);
-                btn.style.setProperty('--y', `${y}px`);
-            });
-        });
-
-        // ✨ 2. ระบบคำนวณทิศทางแสงสะท้อนของกระจก (Global Shimmer & Reflection)
-        const card = document.querySelector('.glass-card');
-        
-        document.addEventListener('mousemove', (e) => {
-            const mouseX = e.clientX;
-            const mouseY = e.clientY;
-            
-            const cardRect = card.getBoundingClientRect();
-            
-            const percentX = ((mouseX - cardRect.left) / cardRect.width) * 100;
-            const percentY = ((mouseY - cardRect.top) / cardRect.height) * 100;
-
-            card.style.setProperty('--shimmer-x', `${percentX}%`);
-            card.style.setProperty('--shimmer-y', `${percentY}%`);
-        });
-
     </script>
 
 </body>
 </html>
+
