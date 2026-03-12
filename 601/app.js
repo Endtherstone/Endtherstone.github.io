@@ -139,6 +139,15 @@ function makeFlipSound() {
 
 const playFlip = makeFlipSound();
 
+class EbookError extends Error {
+  constructor(code, message, cause) {
+    super(message);
+    this.name = "EbookError";
+    this.code = code;
+    this.cause = cause;
+  }
+}
+
 function setButtonsEnabled() {
   ui.prevBtn.disabled = !state.pdf || state.currentPage <= 1 || state.rendering;
   ui.nextBtn.disabled = !state.pdf || state.currentPage >= state.numPages || state.rendering;
@@ -336,8 +345,10 @@ async function loadPdfJs() {
     lastErr = e;
   }
 
-  setStatus("โหลด pdf.js ไม่ได้ (แนะนำใส่ไฟล์ไว้ที่ vendor/pdfjs หรือเช็คอินเทอร์เน็ต/คอนโซล)");
-  throw lastErr || new Error("pdf.js load failed");
+  const msg =
+    "โหลด pdf.js ไม่ได้: เครือข่ายอาจบล็อก CDN หรือยังไม่มีไฟล์ local ที่ vendor/pdfjs/ (เปิด Console จะเห็น error)";
+  setStatus(msg);
+  throw new EbookError("PDFJS_LOAD_FAILED", msg, lastErr);
 }
 
 async function loadPdfJsClassic() {
@@ -385,13 +396,22 @@ async function openPdfSource(source, initialPage) {
   }
 
   const isFile = location.protocol === "file:";
-  const task = state.pdfjs.getDocument({
-    ...(source.data ? { data: source.data } : { url: source.url }),
-    enableXfa: false,
-    // Workers often fail on `file://` due to security restrictions.
-    ...(isFile ? { disableWorker: true } : {}),
-  });
-  state.pdf = await task.promise;
+  let task;
+  try {
+    task = state.pdfjs.getDocument({
+      ...(source.data ? { data: source.data } : { url: source.url }),
+      enableXfa: false,
+      // Workers often fail on `file://` due to security restrictions.
+      ...(isFile ? { disableWorker: true } : {}),
+    });
+    state.pdf = await task.promise;
+  } catch (e) {
+    const msg = source.url
+      ? `เปิด PDF ไม่ได้: ${source.url} (อาจ 404/บล็อก/ไฟล์ใหญ่เกิน หรือ CORS)`
+      : "เปิด PDF ไม่ได้: ไฟล์จากเครื่องอาจเสียหรือไม่ใช่ PDF";
+    setStatus(msg);
+    throw new EbookError("PDF_LOAD_FAILED", msg, e);
+  }
   state.numPages = state.pdf.numPages || 0;
 
   state.currentPage = clamp(initialPage, 1, state.numPages || 1);
@@ -706,7 +726,14 @@ async function main() {
     await openPdfSource({ url: fileUrl, label: file }, page);
   } catch (e) {
     console.warn(e);
-    setStatus("เริ่มระบบไม่สำเร็จ: โหลด PDF/PDF renderer ไม่ได้ (เช็คว่าเปิดผ่าน https หรือ local server)");
+    const code = e && typeof e === "object" && "code" in e ? e.code : null;
+    if (code === "PDFJS_LOAD_FAILED") {
+      setStatus("เริ่มระบบไม่สำเร็จ: โหลดตัวเรนเดอร์ PDF (pdf.js) ไม่ได้ (ดู Console / หรือใส่ไฟล์ไว้ที่ vendor/pdfjs)");
+    } else if (code === "PDF_LOAD_FAILED") {
+      setStatus("เริ่มระบบไม่สำเร็จ: โหลดไฟล์ PDF ไม่ได้ (เช็คว่าไฟล์อยู่บน Pages จริงและเปิดได้)");
+    } else {
+      setStatus("เริ่มระบบไม่สำเร็จ: มีข้อผิดพลาดระหว่างโหลด (เปิด Console เพื่อดูรายละเอียด)");
+    }
     setButtonsEnabled();
     ui.pageTotal.textContent = "–";
     ui.progressText.textContent = "—";
