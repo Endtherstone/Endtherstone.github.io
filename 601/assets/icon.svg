@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7be7ff"/>
+      <stop offset="1" stop-color="#ffd167"/>
+    </linearGradient>
+    <radialGradient id="h" cx="30%" cy="28%" r="70%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".55"/>
+      <stop offset=".6" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="s" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="20" stdDeviation="22" flood-color="#000000" flood-opacity=".35"/>
+    </filter>
+  </defs>
+  <rect x="72" y="72" width="368" height="368" rx="92" fill="url(#g)" filter="url(#s)"/>
+  <rect x="84" y="84" width="344" height="344" rx="86" fill="url(#h)"/>
+  <path d="M170 184c0-16 13-28 29-28h148c32 0 58 26 58 58v136c0 33-26 58-58 58H210c-22 0-40 18-40 40V184z"
+        fill="#0b0f1a" fill-opacity=".88"/>
+  <path d="M202 192h120c20 0 36 16 36 36v124c0 20-16 36-36 36H226c-10 0-18 8-18 18V192z"
+        fill="#ffffff" fill-opacity=".16"/>
+  <path d="M210 214h120" stroke="#ffffff" stroke-opacity=".55" stroke-width="14" stroke-linecap="round"/>
+  <path d="M210 254h98" stroke="#ffffff" stroke-opacity=".45" stroke-width="14" stroke-linecap="round"/>
+  <path d="M210 294h112" stroke="#ffffff" stroke-opacity=".40" stroke-width="14" stroke-linecap="round"/>
+  <path d="M210 334h84" stroke="#ffffff" stroke-opacity=".36" stroke-width="14" stroke-linecap="round"/>
+</svg>
+
