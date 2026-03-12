@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#0b0f1a" />
+    <title>เว็บอีบุค</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./assets/icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./app.css" />
+  </head>
+  <body>
+    <div class="bg" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="brand" role="banner" title="E-Book">
+        <span class="brandMark" aria-hidden="true"></span>
+        <div class="brandText">
+          <div class="brandTitle">E-Book Viewer</div>
+          <div class="brandSub" id="fileLabel">กำลังโหลด…</div>
+        </div>
+      </div>
+
+      <div class="toolbar" role="toolbar" aria-label="เครื่องมือ">
+        <button class="btn" id="tocBtn" type="button" title="สารบัญ">สารบัญ</button>
+        <button class="btn" id="searchBtn" type="button" title="ค้นหา">ค้นหา</button>
+        <div class="sep" aria-hidden="true"></div>
+
+        <button class="btn" id="prevBtn" type="button" title="หน้าก่อนหน้า">ก่อน</button>
+        <div class="pageBox" title="ไปหน้าที่ต้องการ">
+          <input id="pageInput" inputmode="numeric" pattern="[0-9]*" type="text" aria-label="หน้า" />
+          <span class="pageOf" aria-hidden="true">/</span>
+          <span id="pageTotal" class="pageTotal" aria-label="จำนวนหน้าทั้งหมด">–</span>
+        </div>
+        <button class="btn" id="nextBtn" type="button" title="หน้าถัดไป">ถัดไป</button>
+
+        <div class="sep" aria-hidden="true"></div>
+
+        <button class="btn" id="zoomOutBtn" type="button" title="ซูมออก">-</button>
+        <input id="zoomRange" class="zoomRange" type="range" min="50" max="250" value="120" aria-label="ซูม" />
+        <button class="btn" id="zoomInBtn" type="button" title="ซูมเข้า">+</button>
+
+        <div class="sep" aria-hidden="true"></div>
+        <button class="btn" id="fullscreenBtn" type="button" title="เต็มจอ">Fullscreen</button>
+        <button class="btn" id="themeBtn" type="button" title="โหมดมืด/สว่าง">Dark</button>
+        <button class="btn" id="openBtn" type="button" title="เปิดไฟล์ PDF จากเครื่อง">เปิด PDF</button>
+        <button class="btn" id="shareBtn" type="button" title="แชร์หน้าปัจจุบัน">แชร์</button>
+        <a class="btn" id="downloadBtn" href="./หนังสือรุ่น.pdf" download title="ดาวน์โหลด PDF">ดาวน์โหลด</a>
+      </div>
+    </header>
+
+    <main class="stage" role="main">
+      <div class="progressWrap" aria-label="ความคืบหน้า">
+        <div class="progressTrack" aria-hidden="true">
+          <div class="progressBar" id="progressBar" aria-hidden="true"></div>
+        </div>
+        <div class="progressText" id="progressText">–</div>
+      </div>
+
+      <section class="viewerShell" aria-label="ตัวอ่าน">
+        <div class="viewer" id="viewer">
+          <div class="page3d" id="page3d" aria-live="polite">
+            <div class="pageFace pageCurrent">
+              <canvas id="canvasA" class="pageCanvas" width="10" height="10"></canvas>
+            </div>
+            <div class="pageFace pageNext">
+              <canvas id="canvasB" class="pageCanvas" width="10" height="10"></canvas>
+            </div>
+            <div class="pageShade" aria-hidden="true"></div>
+          </div>
+
+          <div class="hud" id="hud">
+            <div class="pill" id="statusPill">กำลังเตรียมระบบ…</div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="drawer" id="drawer" aria-hidden="true">
+        <div class="drawerHead">
+          <div class="drawerTabs" role="tablist" aria-label="เมนู">
+            <button class="tab active" id="tabToc" type="button" role="tab" aria-selected="true">สารบัญ</button>
+            <button class="tab" id="tabSearch" type="button" role="tab" aria-selected="false">ค้นหา</button>
+            <button class="tab" id="tabAbout" type="button" role="tab" aria-selected="false">สรุประบบ</button>
+          </div>
+          <button class="iconBtn" id="drawerCloseBtn" type="button" title="ปิด">✕</button>
+        </div>
+
+        <div class="drawerBody">
+          <div class="pane" id="paneToc" role="tabpanel">
+            <div class="paneTitle">สารบัญ</div>
+            <div class="paneHint">แตะหัวข้อเพื่อไปหน้า</div>
+            <div class="list" id="tocList"></div>
+          </div>
+
+          <div class="pane hidden" id="paneSearch" role="tabpanel">
+            <div class="paneTitle">ค้นหาในหนังสือ</div>
+            <div class="searchRow">
+              <input id="searchInput" class="searchInput" type="search" placeholder="พิมพ์คำ แล้วกด Enter" aria-label="ค้นหา" />
+              <button class="btn" id="searchGoBtn" type="button">ค้นหา</button>
+            </div>
+            <div class="paneHint" id="searchHint">ค้นหาจะดึงข้อความทีละหน้าแบบ Lazy</div>
+            <div class="list" id="searchResults"></div>
+          </div>
+
+          <div class="pane hidden" id="paneAbout" role="tabpanel">
+            <div class="paneTitle">สรุประบบทั้งหมด</div>
+            <div class="featureGrid" id="featureGrid"></div>
+            <div class="paneHint">
+              หมายเหตุ: ถ้าเปิดเว็บแบบออฟไลน์ตั้งแต่ครั้งแรก pdf.js (ตัวเรนเดอร์ PDF) อาจยังไม่ถูกแคช
+              ให้ต่อเน็ตครั้งแรก 1 ครั้งเพื่อให้ PWA แคชทรัพยากร แล้วใช้งานออฟไลน์ได้
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="scrim" id="scrim" aria-hidden="true"></div>
+    </main>
+
+    <input id="fileInput" type="file" accept="application/pdf" style="position:fixed;left:-9999px;top:-9999px" />
+
+    <template id="featureTpl">
+      <div class="feature">
+        <div class="featureName"></div>
+        <div class="featureState">✅</div>
+        <div class="featureDesc"></div>
+      </div>
+    </template>
+
+    <script>
+      (function () {
+        function pill() { return document.getElementById("statusPill"); }
+        function set(msg) { var el = pill(); if (el) el.textContent = msg; }
+        window.__ebook_booted = false;
+        // If module JS fails to start, at least show a helpful message instead of hanging forever.
+        setTimeout(function () {
+          if (!window.__ebook_booted) {
+            set("กำลังเริ่มระบบ… ถ้านานเกินไป: โปรดเปิดผ่าน GitHub Pages (https) หรือผ่าน local server (ไม่ใช่ file://)");
+          }
+        }, 3500);
+        window.addEventListener("error", function () {
+          set("เกิดข้อผิดพลาดระหว่างเริ่มระบบ (เปิด DevTools Console เพื่อดูรายละเอียด)");
+        });
+        window.addEventListener("unhandledrejection", function () {
+          set("เริ่มระบบไม่สำเร็จ (Promise rejection) เปิด DevTools Console เพื่อดูรายละเอียด");
+        });
+      })();
+    </script>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
