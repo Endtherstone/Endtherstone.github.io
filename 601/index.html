@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หนังสือรุ่นของเรา - A4 Flipbook</title>
+    <style>
+        body {
+            /* พื้นหลังสีเข้มแบบเว็บ Flipbook พรีเมียม */
+            background-color: #2c2f33; 
+            background-image: radial-gradient(circle, #40444b 0%, #23272a 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        /* กล่องคุมพื้นที่ให้อยู่ตรงกลางและมีปุ่มซ้ายขวา */
+        .wrapper {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            width: 95%;
+            max-width: 1200px;
+            justify-content: center;
+        }
+
+        /* กล่องบรรจุหนังสือ */
+        .book-container {
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            /* เพิ่มบรรทัดนี้เพื่อให้ตอนขยับกลางซ้ายขวาดูสมูท */
+
+            transition: transform 0.5s ease-in-out;
+        }
+
+        /* ตั้งค่าแต่ละหน้า */
+        .my-page {
+            background-color: #ffffff;
+            overflow: hidden;
+            border: solid 1px #e3e3e3;
+        }
+
+        /* จัดการรูปภาพให้พอดีกับหน้า A4 */
+        .my-page img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            /* หากรูปโดนตัดขอบเยอะไป ให้เปลี่ยน cover เป็น contain และใส่พื้นหลังสีขาวเพิ่ม */
+        }
+
+        /* เงาสันหนังสือให้ดูมีมิติสมจริง */
+        .my-page.--left {
+            border-right: 0;
+            box-shadow: inset -15px 0 30px -10px rgba(0,0,0,0.15);
+        }
+        .my-page.--right {
+            border-left: 0;
+            box-shadow: inset 15px 0 30px -10px rgba(0,0,0,0.15);
+        }
+
+        /* ปุ่มเปลี่ยนหน้าสไตล์ Heyzine */
+        .nav-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .nav-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        /* ซ่อนปุ่มเมื่อเปิดในมือถือ (ใช้การปัดนิ้วแทน) */
+        @media (max-width: 768px) {
+            .nav-btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <button class="nav-btn" id="btn-prev">❮</button>
+
+        <div class="book-container">
+            <div id="book">
+                <div class="my-page"><img src="1.png" alt="ปกหนังสือ"></div>
+                <div class="my-page"><img src="2.png" alt="หน้า 2"></div>
+                <div class="my-page"><img src="3.png" alt="หน้า 3"></div>
+                <div class="my-page"><img src="4.png" alt="หน้า 4"></div>
+                <div class="my-page"><img src="5.png" alt="หน้า 5"></div>
+                <div class="my-page"><img src="6.png" alt="หน้า 6"></div>
+                <div class="my-page"><img src="7.png" alt="หน้า 7"></div>
+                <div class="my-page"><img src="8.png" alt="หน้า 8"></div>
+                <div class="my-page"><img src="9.png" alt="หน้า 9"></div>
+                <div class="my-page"><img src="10.png" alt="หน้า 10"></div>
+                <div class="my-page"><img src="11.png" alt="หน้า 11"></div>
+                <div class="my-page"><img src="12.png" alt="ปกหลัง"></div>
+            </div>
+        </div>
+
+        <button class="nav-btn" id="btn-next">❯</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const bookElement = document.getElementById('book');
+
+            // ตั้งค่าแบบ Heyzine (Responsive + A4)
+            const pageFlip = new St.PageFlip(bookElement, {
+                width: 380,             // ความกว้างฐาน (A4)
+                height: 537,            // ความสูงฐาน (A4)
+                size: "stretch",        // ยืดหยุ่นตามขนาดจอ
+                minWidth: 300,          // ขนาดเล็กสุดที่จะหดลงไป
+                maxWidth: 420,          // ขนาดใหญ่สุด
+                minHeight: 424,
+                maxHeight: 594,
+                showCover: true,        // แสดงหน้าปกเดี่ยวๆ
+                mobileScrollSupport: true, 
+                maxShadowOpacity: 0.5,  // ความเข้มของเงาตอนพลิก
+
+                /* ------ เพิ่ม 2 บรรทัดนี้ ------ */
+                displayType: "double",  // 🌟 กำหนดให้แสดงผลแบบ 2 หน้าคู่กัน
+                usePortrait: false      // 🌟 ปิดการสลับเป็นหน้าเดียวเมื่อจอแคบ (บังคับให้เป็น 2 หน้าเสมอ)
+            
+            });
+
+            // โหลดหน้าทั้งหมด
+            pageFlip.loadFromHTML(document.querySelectorAll('.my-page'));
+            // --- ส่วนที่เพิ่มเพื่อจัดหน้าปกให้อยู่ตรงกลาง ---
+const container = document.querySelector('.book-container');
+
+const updateMid = (index) => {
+    const total = pageFlip.getPageCount();
+    if (index === 0) {
+        container.style.transform = 'translateX(-25%)'; // หน้าแรก (ปกหน้า)
+    } else if (index === total - 1) {
+        container.style.transform = 'translateX(25%)';  // หน้าสุดท้าย (ปกหลัง)
+    } else {
+        container.style.transform = 'translateX(0)';    // หน้าคู่ปกติ
+    }
+};
+
+// ตรวจสอบทันทีที่โหลด
+updateMid(pageFlip.getCurrentPageIndex());
+
+// ตรวจสอบทุกครั้งที่มีการเปลี่ยนหน้า (คลิกปุ่ม, พลิกหน้า, หรือลาก)
+pageFlip.on('flip', (e) => updateMid(e.data));
+pageFlip.on('update', (e) => updateMid(e.data));
+// ------------------------------------------
+
+            // สั่งการปุ่มกดเปลี่ยนหน้า
+            document.getElementById('btn-prev').addEventListener('click', () => {
+                pageFlip.flipPrev();
+            });
+
+            document.getElementById('btn-next').addEventListener('click', () => {
+                pageFlip.flipNext();
+            });
+        });
+
+
+    </script>
+</body>
+</html>
