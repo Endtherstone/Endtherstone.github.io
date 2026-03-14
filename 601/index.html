@@ -22,11 +22,11 @@
             display: flex;
             align-items: center;
             gap: 20px;
-            /* 🌟 ปรับให้ใช้พื้นที่หน้าจอคอมได้เต็มที่ขึ้น */
             width: 90vw; 
             height: 80vh; 
             max-width: 1400px;
             justify-content: center;
+            position: relative; /* เพิ่ม relative เพื่อให้ปุ่มมือถือลอยอยู่บนนี้ได้ */
         }
 
         .book-container {
@@ -35,12 +35,12 @@
             transform-origin: center center;
             user-select: none; 
             -webkit-user-select: none;
-            /* 🌟 บังคับให้กล่องหนังสือขยายเต็มพื้นที่ที่ Wrapper กำหนดให้ */
             width: 100%;
             height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
         }
 
         .my-page {
@@ -129,18 +129,33 @@
             font-family: monospace;
         }
 
+        /* 🌟 ปรับแก้สำหรับมือถือ: เปลี่ยนจากการซ่อนปุ่ม เป็นเอาปุ่มมาลอยทับขอบหนังสือแทน */
         @media (max-width: 768px) {
-            .nav-btn {
-                display: none;
-            }
             .wrapper {
-                width: 95vw;
-                height: 75vh; 
+                width: 100vw;
+                height: 85vh; 
+                gap: 0;
             }
+            .nav-btn {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                z-index: 50;
+                background-color: rgba(0, 0, 0, 0.2); /* ทำให้โปร่งแสง ไม่บังหน้าจอเยอะ */
+                width: 40px;
+                height: 40px;
+            }
+            .nav-btn:hover {
+                transform: translateY(-50%) scale(1.1);
+            }
+            #btn-prev { left: 5px; }
+            #btn-next { right: 5px; }
         }
     </style>
 </head>
 <body>
+
+    <audio id="flip-sound" src="https://www.soundjay.com/misc/sounds/page-flip-01a.mp3" preload="auto"></audio>
 
     <div class="wrapper">
         <button class="nav-btn" id="btn-prev">❮</button>
@@ -178,10 +193,9 @@
             const bookElement = document.getElementById('book');
             const container = document.getElementById('book-container');
             const zoomDisplay = document.getElementById('zoom-display');
+            const flipSound = document.getElementById('flip-sound'); // 🌟 เรียกใช้งานเสียง
             
             let currentZoom = 1;
-
-            // 🌟 เช็คเลยว่าหน้าจอตอนนี้ความกว้างเกิน 768px (คอมพิวเตอร์/แท็บเล็ตแนวนอน) หรือไม่
             const isMobile = window.innerWidth <= 768;
 
             const pageFlip = new St.PageFlip(bookElement, {
@@ -196,16 +210,22 @@
                 maxShadowOpacity: 0.5,  
 
                 displayType: "double",  
-                // 🌟 หัวใจสำคัญอยู่ตรงนี้: 
-                // ถ้าเป็นมือถือ (isMobile = true) ยอมให้โชว์หน้าเดี่ยวได้
-                // ถ้าเป็นคอม (isMobile = false) บังคับโชว์หน้าคู่เท่านั้น!
                 usePortrait: isMobile,        
                 
                 mobileScrollSupport: false, 
-                swipeDistance: 15         
+                swipeDistance: 30 // 🌟 เพิ่มระยะปัด (จาก 15 เป็น 30) เพื่อไม่ให้ลั่นง่ายเวลาเอานิ้วแตะจอ
             });
 
             pageFlip.loadFromHTML(document.querySelectorAll('.my-page'));
+
+            // 🌟 ฟังก์ชันเล่นเสียง
+            const playFlipSound = () => {
+                flipSound.currentTime = 0; // รีเซ็ตเสียงให้เริ่มใหม่ทันที
+                flipSound.play().catch(e => {
+                    // Browser บางตัวอาจบล็อกเสียงถ้าผู้ใช้ยังไม่ได้คลิก/สัมผัสจอ
+                    console.log("Audio waiting for user interaction"); 
+                });
+            };
 
             const updateTransform = () => {
                 const index = pageFlip.getCurrentPageIndex();
@@ -229,7 +249,12 @@
 
             updateTransform();
 
-            pageFlip.on('flip', () => updateTransform());
+            // 🌟 ผูกการเล่นเสียงเข้ากับ Event พลิกหน้า
+            pageFlip.on('flip', () => {
+                playFlipSound(); 
+                updateTransform();
+            });
+            
             pageFlip.on('update', () => updateTransform());
             pageFlip.on('changeOrientation', () => updateTransform());
 
