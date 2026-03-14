@@ -14,20 +14,19 @@
             min-height: 100vh;
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden; /* ป้องกันแถบ Scrollbar กวนใจเวลาซูมบน PC */
-            /* ป้องกันมือถือปัดแล้วดึงหน้าเว็บ (Pull-to-refresh) เผลอรีเฟรชเอง */
+            overflow: hidden; 
             overscroll-behavior-y: none;
         }
 
         .wrapper {
             display: flex;
             align-items: center;
-            gap: 30px;
-            width: 95%;
+            gap: 20px;
+            /* 🌟 ปรับให้ใช้พื้นที่หน้าจอคอมได้เต็มที่ขึ้น */
+            width: 90vw; 
+            height: 80vh; 
             max-width: 1400px;
-            height: 85vh; /* 🌟 สำคัญมาก: กำหนดความสูงเพื่อให้ระบบรู้สัดส่วนพื้นที่และกางเป็นหน้าคู่บน PC */
             justify-content: center;
-            padding: 20px 0; 
         }
 
         .book-container {
@@ -36,8 +35,11 @@
             transform-origin: center center;
             user-select: none; 
             -webkit-user-select: none;
-            height: 100%; /* ให้ Container สูงเต็มพื้นที่ Wrapper */
+            /* 🌟 บังคับให้กล่องหนังสือขยายเต็มพื้นที่ที่ Wrapper กำหนดให้ */
+            width: 100%;
+            height: 100%;
             display: flex;
+            justify-content: center;
             align-items: center;
         }
 
@@ -79,7 +81,6 @@
             transform: scale(1.1);
         }
 
-        /* --- แผงควบคุมการซูม --- */
         .zoom-controls {
             position: fixed;
             bottom: 20px;
@@ -133,7 +134,8 @@
                 display: none;
             }
             .wrapper {
-                height: 75vh; /* ปรับลดลงนิดหน่อยบนมือถือเพื่อเผื่อที่ให้ปุ่มซูม */
+                width: 95vw;
+                height: 75vh; 
             }
         }
     </style>
@@ -179,27 +181,32 @@
             
             let currentZoom = 1;
 
+            // 🌟 เช็คเลยว่าหน้าจอตอนนี้ความกว้างเกิน 768px (คอมพิวเตอร์/แท็บเล็ตแนวนอน) หรือไม่
+            const isMobile = window.innerWidth <= 768;
+
             const pageFlip = new St.PageFlip(bookElement, {
-                width: 400,             // 🌟 ปรับขนาดเริ่มต้นให้กว้างขึ้นตามสัดส่วน
-                height: 565,            // 🌟 สัดส่วนใกล้เคียง A4
+                width: 400,             
+                height: 565,            
                 size: "stretch",        
-                minWidth: 300,          
-                maxWidth: 800,          // 🌟 ขยาย MaxWidth ให้คอมพิวเตอร์กางหน้าคู่ได้แบบเต็มจอ
-                minHeight: 400,
-                maxHeight: 1100,        // 🌟 ขยาย MaxHeight ให้สัมพันธ์กัน
+                minWidth: 315,          
+                maxWidth: 1000,          
+                minHeight: 420,
+                maxHeight: 1350,        
                 showCover: true,        
                 maxShadowOpacity: 0.5,  
 
                 displayType: "double",  
-                usePortrait: true,        
+                // 🌟 หัวใจสำคัญอยู่ตรงนี้: 
+                // ถ้าเป็นมือถือ (isMobile = true) ยอมให้โชว์หน้าเดี่ยวได้
+                // ถ้าเป็นคอม (isMobile = false) บังคับโชว์หน้าคู่เท่านั้น!
+                usePortrait: isMobile,        
+                
                 mobileScrollSupport: false, 
                 swipeDistance: 15         
             });
 
-            // โหลดหน้าทั้งหมด
             pageFlip.loadFromHTML(document.querySelectorAll('.my-page'));
 
-            // ฟังก์ชันอัปเดตการจัดกลาง และ การอัปเดตตัวเลขซูม
             const updateTransform = () => {
                 const index = pageFlip.getCurrentPageIndex();
                 const total = pageFlip.getPageCount();
@@ -209,31 +216,26 @@
                 
                 let translateX = 0;
 
-                // ขยับปกซ้าย-ขวาเฉพาะตอนที่เป็นหน้าคู่ (PC) เท่านั้น
                 if (isLandscape) {
                     if (index === 0) {
-                        translateX = -25; // ปกหน้า ขยับมาตรงกลาง
+                        translateX = -25; 
                     } else if (index === total - 1) {
-                        translateX = 25;  // ปกหลัง ขยับมาตรงกลาง
+                        translateX = 25;  
                     }
                 }
 
                 container.style.transform = `scale(${currentZoom}) translateX(${translateX}%)`;
             };
 
-            // ตรวจสอบหลังจากโหลดเสร็จ
             updateTransform();
 
-            // ตรวจสอบทุกครั้งที่มีการเปลี่ยนหน้า หรือหมุนจอ
             pageFlip.on('flip', () => updateTransform());
             pageFlip.on('update', () => updateTransform());
             pageFlip.on('changeOrientation', () => updateTransform());
 
-            // สั่งการปุ่มลูกศร (สำหรับ PC)
             document.getElementById('btn-prev').addEventListener('click', () => { pageFlip.flipPrev(); });
             document.getElementById('btn-next').addEventListener('click', () => { pageFlip.flipNext(); });
 
-            // --- ระบบจัดการปุ่มซูม ---
             document.getElementById('btn-zoom-in').addEventListener('click', () => {
                 if (currentZoom < 3.0) {
                     currentZoom += 0.25;
