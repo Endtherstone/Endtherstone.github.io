@@ -14,7 +14,7 @@
             min-height: 100vh;
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: auto; 
+            overflow: hidden; /* ป้องกันแถบ Scrollbar กวนใจเวลาซูมบน PC */
             /* ป้องกันมือถือปัดแล้วดึงหน้าเว็บ (Pull-to-refresh) เผลอรีเฟรชเอง */
             overscroll-behavior-y: none;
         }
@@ -22,21 +22,23 @@
         .wrapper {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 30px;
             width: 95%;
-            max-width: 1200px;
+            max-width: 1400px;
+            height: 85vh; /* 🌟 สำคัญมาก: กำหนดความสูงเพื่อให้ระบบรู้สัดส่วนพื้นที่และกางเป็นหน้าคู่บน PC */
             justify-content: center;
-            padding: 60px 0; 
+            padding: 20px 0; 
         }
 
         .book-container {
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            /* ปรับ transform ให้สมูทขึ้นมากเวลาจัดหน้าและซูม */
             transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1); 
             transform-origin: center center;
-            /* ป้องกันการคลุมดำรูปภาพเวลาทัชรัวๆ บนมือถือ */
             user-select: none; 
             -webkit-user-select: none;
+            height: 100%; /* ให้ Container สูงเต็มพื้นที่ Wrapper */
+            display: flex;
+            align-items: center;
         }
 
         .my-page {
@@ -49,7 +51,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover; 
-            pointer-events: none; /* ป้องกันมือถือกดค้างแล้วขึ้นเมนูเซฟรูป บังการเปลี่ยนหน้า */
+            pointer-events: none; 
         }
 
         .my-page.--left { border-right: 0; box-shadow: inset -15px 0 30px -10px rgba(0,0,0,0.15); }
@@ -117,7 +119,6 @@
             transform: scale(0.9);
         }
 
-        /* กล่องสำหรับแสดงตัวเลข % */
         .zoom-text {
             color: white;
             font-weight: bold;
@@ -130,6 +131,9 @@
         @media (max-width: 768px) {
             .nav-btn {
                 display: none;
+            }
+            .wrapper {
+                height: 75vh; /* ปรับลดลงนิดหน่อยบนมือถือเพื่อเผื่อที่ให้ปุ่มซูม */
             }
         }
     </style>
@@ -176,21 +180,20 @@
             let currentZoom = 1;
 
             const pageFlip = new St.PageFlip(bookElement, {
-                width: 380,             
-                height: 537,            
+                width: 400,             // 🌟 ปรับขนาดเริ่มต้นให้กว้างขึ้นตามสัดส่วน
+                height: 565,            // 🌟 สัดส่วนใกล้เคียง A4
                 size: "stretch",        
                 minWidth: 300,          
-                maxWidth: 450,          // ปรับกว้างขึ้น เพื่อให้ PC แสดงหน้าคู่ได้อย่างสมบูรณ์
+                maxWidth: 800,          // 🌟 ขยาย MaxWidth ให้คอมพิวเตอร์กางหน้าคู่ได้แบบเต็มจอ
                 minHeight: 400,
-                maxHeight: 650,
+                maxHeight: 1100,        // 🌟 ขยาย MaxHeight ให้สัมพันธ์กัน
                 showCover: true,        
                 maxShadowOpacity: 0.5,  
 
-                /* 🌟 การตั้งค่าสำคัญสำหรับแก้ปัญหามือถือ 🌟 */
                 displayType: "double",  
-                usePortrait: true,        // ยอมให้มือถือสลับเป็นแนวตั้ง (หน้าเดี่ยว) 
-                mobileScrollSupport: false, // ปิดเพื่อไม่ให้การเลื่อนนิ้วขึ้นลงไปกวนการปัดหน้ากระดาษ
-                swipeDistance: 15         // ลดระยะนิ้วสัมผัส ปัดนิดเดียวก็เปลี่ยนหน้า ไม่เด้งกลับ
+                usePortrait: true,        
+                mobileScrollSupport: false, 
+                swipeDistance: 15         
             });
 
             // โหลดหน้าทั้งหมด
@@ -200,14 +203,13 @@
             const updateTransform = () => {
                 const index = pageFlip.getCurrentPageIndex();
                 const total = pageFlip.getPageCount();
-                const isLandscape = pageFlip.getOrientation() === 'landscape'; // เช็คว่าเป็นหน้าคู่หรือไม่
+                const isLandscape = pageFlip.getOrientation() === 'landscape'; 
                 
-                // 1. อัปเดตตัวเลขเปอร์เซ็นต์บนจอ
                 zoomDisplay.innerText = Math.round(currentZoom * 100) + '%';
                 
                 let translateX = 0;
 
-                // 2. ขยับปกซ้าย-ขวาเฉพาะตอนที่เป็นหน้าคู่ (PC) เท่านั้น
+                // ขยับปกซ้าย-ขวาเฉพาะตอนที่เป็นหน้าคู่ (PC) เท่านั้น
                 if (isLandscape) {
                     if (index === 0) {
                         translateX = -25; // ปกหน้า ขยับมาตรงกลาง
@@ -216,11 +218,10 @@
                     }
                 }
 
-                // 3. ใช้ Scale และ Translate รวมกัน
                 container.style.transform = `scale(${currentZoom}) translateX(${translateX}%)`;
             };
 
-            // ตรวจสอบทันทีที่โหลด
+            // ตรวจสอบหลังจากโหลดเสร็จ
             updateTransform();
 
             // ตรวจสอบทุกครั้งที่มีการเปลี่ยนหน้า หรือหมุนจอ
@@ -234,26 +235,24 @@
 
             // --- ระบบจัดการปุ่มซูม ---
             document.getElementById('btn-zoom-in').addEventListener('click', () => {
-                if (currentZoom < 3.0) { // ซูมได้ถึง 300%
+                if (currentZoom < 3.0) {
                     currentZoom += 0.25;
                     updateTransform();
                 }
             });
 
             document.getElementById('btn-zoom-out').addEventListener('click', () => {
-                if (currentZoom > 0.5) { // หดได้สุด 50%
+                if (currentZoom > 0.5) {
                     currentZoom -= 0.25;
                     updateTransform();
                 }
             });
 
-            // กดที่ตัวเลข % เพื่อรีเซ็ตกลับเป็น 100%
             zoomDisplay.addEventListener('click', () => {
                 currentZoom = 1;
                 updateTransform();
-                zoomDisplay.style.cursor = 'pointer';
             });
-            zoomDisplay.style.cursor = 'pointer'; // เปลี่ยน cursor ให้รู้ว่ากดได้
+            zoomDisplay.style.cursor = 'pointer'; 
         });
     </script>
 </body>
