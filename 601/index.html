@@ -12,10 +12,10 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
+            overflow: auto; /* เปลี่ยนจาก hidden เป็น auto เพื่อให้เลื่อนดูได้ตอนซูม */
         }
 
         /* กล่องคุมพื้นที่ให้อยู่ตรงกลางและมีปุ่มซ้ายขวา */
@@ -26,15 +26,15 @@
             width: 95%;
             max-width: 1200px;
             justify-content: center;
+            padding: 50px 0; /* เพิ่มพื้นที่เผื่อการซูม */
         }
 
         /* กล่องบรรจุหนังสือ */
         .book-container {
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
             border-radius: 4px;
-            /* เพิ่มบรรทัดนี้เพื่อให้ตอนขยับกลางซ้ายขวาดูสมูท */
-
-            transition: transform 0.5s ease-in-out;
+            transition: transform 0.4s ease-in-out; /* ทำให้ซูมและจัดกลางสมูท */
+            transform-origin: center center;
         }
 
         /* ตั้งค่าแต่ละหน้า */
@@ -49,7 +49,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover; 
-            /* หากรูปโดนตัดขอบเยอะไป ให้เปลี่ยน cover เป็น contain และใส่พื้นหลังสีขาวเพิ่ม */
         }
 
         /* เงาสันหนังสือให้ดูมีมิติสมจริง */
@@ -76,6 +75,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-shrink: 0;
+            z-index: 10;
         }
 
         .nav-btn:hover {
@@ -83,7 +84,37 @@
             transform: scale(1.1);
         }
 
-        /* ซ่อนปุ่มเมื่อเปิดในมือถือ (ใช้การปัดนิ้วแทน) */
+        /* ระบบปุ่มซูม */
+        .zoom-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 30px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .zoom-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .zoom-btn:hover {
+            color: #4CAF50;
+        }
+
+        /* เมื่อเปิดในมือถือ ซ่อนปุ่มลูกศร (ใช้ปัดเอา) */
         @media (max-width: 768px) {
             .nav-btn {
                 display: none;
@@ -96,7 +127,7 @@
     <div class="wrapper">
         <button class="nav-btn" id="btn-prev">❮</button>
 
-        <div class="book-container">
+        <div class="book-container" id="book-container">
             <div id="book">
                 <div class="my-page"><img src="1.png" alt="ปกหนังสือ"></div>
                 <div class="my-page"><img src="2.png" alt="หน้า 2"></div>
@@ -116,66 +147,103 @@
         <button class="nav-btn" id="btn-next">❯</button>
     </div>
 
+    <div class="zoom-controls">
+        <button class="zoom-btn" id="btn-zoom-out">➖</button>
+        <button class="zoom-btn" id="btn-zoom-reset">100%</button>
+        <button class="zoom-btn" id="btn-zoom-in">➕</button>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const bookElement = document.getElementById('book');
+            const container = document.getElementById('book-container');
+            
+            // ตัวแปรสำหรับระบบซูม
+            let currentZoom = 1;
 
-            // ตั้งค่าแบบ Heyzine (Responsive + A4)
             const pageFlip = new St.PageFlip(bookElement, {
                 width: 380,             // ความกว้างฐาน (A4)
                 height: 537,            // ความสูงฐาน (A4)
                 size: "stretch",        // ยืดหยุ่นตามขนาดจอ
-                minWidth: 300,          // ขนาดเล็กสุดที่จะหดลงไป
-                maxWidth: 420,          // ขนาดใหญ่สุด
+                minWidth: 300,          
+                maxWidth: 420,          
                 minHeight: 424,
                 maxHeight: 594,
-                showCover: true,        // แสดงหน้าปกเดี่ยวๆ
+                showCover: true,        
                 mobileScrollSupport: true, 
-                maxShadowOpacity: 0.5,  // ความเข้มของเงาตอนพลิก
+                maxShadowOpacity: 0.5,  
 
-                /* ------ เพิ่ม 2 บรรทัดนี้ ------ */
-                displayType: "double",  // 🌟 กำหนดให้แสดงผลแบบ 2 หน้าคู่กัน
-                usePortrait: false      // 🌟 ปิดการสลับเป็นหน้าเดียวเมื่อจอแคบ (บังคับให้เป็น 2 หน้าเสมอ)
-            
+                /* แก้ไขส่วนนี้: เอา usePortrait: false ออก 
+                   เพื่อให้จอมือถือสลับเป็นแนวตั้ง (แสดงหน้าเดียว) อัตโนมัติ */
+                displayType: "double",  
             });
 
             // โหลดหน้าทั้งหมด
             pageFlip.loadFromHTML(document.querySelectorAll('.my-page'));
-            // --- ส่วนที่เพิ่มเพื่อจัดหน้าปกให้อยู่ตรงกลาง ---
-const container = document.querySelector('.book-container');
 
-const updateMid = (index) => {
-    const total = pageFlip.getPageCount();
-    if (index === 0) {
-        container.style.transform = 'translateX(-25%)'; // หน้าแรก (ปกหน้า)
-    } else if (index === total - 1) {
-        container.style.transform = 'translateX(25%)';  // หน้าสุดท้าย (ปกหลัง)
-    } else {
-        container.style.transform = 'translateX(0)';    // หน้าคู่ปกติ
-    }
-};
+            // ฟังก์ชันอัปเดตทั้งการจัดกลาง (Translate) และการซูม (Scale)
+            const updateTransform = () => {
+                const index = pageFlip.getCurrentPageIndex();
+                const total = pageFlip.getPageCount();
+                
+                // ตรวจสอบว่าแสดงผลแบบหน้าคู่ (Landscape) หรือหน้าเดี่ยว (Portrait)
+                const isLandscape = pageFlip.getOrientation() === 'landscape';
+                
+                let translateX = 0;
 
-// ตรวจสอบทันทีที่โหลด
-updateMid(pageFlip.getCurrentPageIndex());
+                // จะขยับปกซ้าย-ขวาเฉพาะตอนที่อยู่ PC (หน้าคู่) เท่านั้น
+                if (isLandscape) {
+                    if (index === 0) {
+                        translateX = -25; // ปกหน้า
+                    } else if (index === total - 1) {
+                        translateX = 25;  // ปกหลัง
+                    }
+                }
 
-// ตรวจสอบทุกครั้งที่มีการเปลี่ยนหน้า (คลิกปุ่ม, พลิกหน้า, หรือลาก)
-pageFlip.on('flip', (e) => updateMid(e.data));
-pageFlip.on('update', (e) => updateMid(e.data));
-// ------------------------------------------
+                // รันคำสั่งรวมกันทั้งขยับแกน X และซูม
+                container.style.transform = `translateX(${translateX}%) scale(${currentZoom})`;
+            };
+
+            // ตรวจสอบทันทีที่โหลด
+            updateTransform();
+
+            // ตรวจสอบทุกครั้งที่มีการเปลี่ยนหน้า
+            pageFlip.on('flip', () => updateTransform());
+            pageFlip.on('update', () => updateTransform());
+            
+            // ตรวจสอบเมื่อมีการหมุนจอ (เปลี่ยนจากหน้าเดี่ยวเป็นคู่ หรือกลับกัน)
+            pageFlip.on('changeOrientation', () => updateTransform());
 
             // สั่งการปุ่มกดเปลี่ยนหน้า
             document.getElementById('btn-prev').addEventListener('click', () => {
                 pageFlip.flipPrev();
             });
-
             document.getElementById('btn-next').addEventListener('click', () => {
                 pageFlip.flipNext();
             });
+
+            // --- ระบบจัดการปุ่มซูม ---
+            document.getElementById('btn-zoom-in').addEventListener('click', () => {
+                if (currentZoom < 2.5) { // ซูมได้สูงสุด 2.5 เท่า
+                    currentZoom += 0.25;
+                    updateTransform();
+                }
+            });
+
+            document.getElementById('btn-zoom-out').addEventListener('click', () => {
+                if (currentZoom > 0.75) { // ซูมออกได้สุด 0.75 เท่า
+                    currentZoom -= 0.25;
+                    updateTransform();
+                }
+            });
+
+            document.getElementById('btn-zoom-reset').addEventListener('click', () => {
+                currentZoom = 1; // คืนค่าเริ่มต้น
+                updateTransform();
+            });
         });
-
-
     </script>
 </body>
 </html>
