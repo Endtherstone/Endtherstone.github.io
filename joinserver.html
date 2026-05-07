@@ -3,260 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft Server | Official Website</title>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>เมืองปิ๊ใหม่ | Minecraft Server</title>
+    <!-- ฟอนต์ Prompt จาก Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --primary-green: #10b981;
-            --discord-color: #5865F2;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #334155;
-            --accent-yellow: #fbbf24;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --primary: #10b981;
+            --discord: #5865F2;
+            --text: #f8fafc;
+            --border: #334155;
+            --disabled: #475569;
         }
-
-        * { box-sizing: border-box; }
 
         body {
             font-family: 'Prompt', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            background-color: var(--bg);
+            color: var(--text);
             margin: 0;
-            padding: 0;
-            line-height: 1.6;
-        }
-
-        /* Container หลัก */
-        .wrapper {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        /* ส่วนหัว (Hero Section) */
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            background: linear-gradient(to right, #10b981, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero-buttons {
+            padding: 10px;
             display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 25px;
-            flex-wrap: wrap;
-        }
-
-        /* สไตล์ปุ่ม */
-        .btn {
-            padding: 12px 25px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 600;
-            display: inline-flex;
+            flex-direction: column;
             align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: none;
-            font-size: 1rem;
         }
 
-        .btn-discord { background-color: var(--discord-color); color: white; }
-        .btn-play { background-color: var(--primary-green); color: white; }
-        .btn:hover { transform: translateY(-3px); filter: brightness(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .container { max-width: 600px; width: 100%; margin-top: 20px; }
 
-        /* การ์ดเนื้อหา */
-        .section-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
+        header { text-align: center; margin-bottom: 30px; }
+        header h1 { font-size: 2.2rem; margin: 0; color: var(--primary); text-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
+
+        .section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
         }
 
-        h2 {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.5rem;
-            margin-top: 0;
-            color: var(--accent-yellow);
-        }
+        h2 { font-size: 1.2rem; margin-top: 0; display: flex; align-items: center; gap: 10px; color: var(--primary); }
 
-        /* ส่วนกฎระเบียบ */
-        .rules-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
+        .rule-item { margin-bottom: 10px; display: flex; gap: 10px; font-size: 0.95rem; color: #cbd5e1; }
+        .rule-item i { color: var(--primary); margin-top: 4px; }
 
-        .rule-item {
-            background: rgba(15, 23, 42, 0.4);
-            padding: 15px;
-            border-radius: 12px;
-            border-left: 4px solid var(--primary-green);
-        }
-
-        /* ส่วนสอนเข้าเซิร์ฟเวอร์ */
         .tutorial-img {
             width: 100%;
             border-radius: 12px;
+            margin: 10px 0;
+            border: 1px solid var(--border);
+            background: #000;
+        }
+
+        /* ส่วนแสดง IP */
+        .ip-display {
+            background: #000;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: monospace;
+            text-align: center;
+            border: 1px dashed var(--primary);
             margin: 15px 0;
-            border: 2px solid var(--border-color);
-            background: #000; /* พื้นหลังสีดำกรณีรูปยังไม่มา */
-            min-height: 200px;
+            font-size: 1.1rem;
+        }
+
+        /* กล่องกดยอมรับ */
+        .accept-box {
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid var(--primary);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-label {
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        /* กล่อง IP */
-        .ip-box {
-            background: #000;
-            padding: 15px 20px;
-            border-radius: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-family: monospace;
-            font-size: 1.2rem;
-            border: 1px dashed var(--primary-green);
-            margin: 20px 0;
-        }
-
-        .copy-btn {
-            background: transparent;
-            color: var(--primary-green);
-            border: 1px solid var(--primary-green);
-            padding: 5px 12px;
-            border-radius: 8px;
+            gap: 10px;
             cursor: pointer;
-            font-family: 'Prompt', sans-serif;
-            font-size: 0.8rem;
+            font-weight: 500;
         }
 
-        /* หน้าจอเล็ก */
-        @media (max-width: 600px) {
-            h1 { font-size: 1.8rem; }
-            .section-card { padding: 20px; }
-            .btn { width: 100%; justify-content: center; }
+        input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
+
+        /* ปุ่มกด */
+        .btn-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 40px; }
+
+        .btn {
+            padding: 16px;
+            border-radius: 12px;
+            text-decoration: none;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: 0.2s;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
-        /* Toast Message */
+        .btn-play { background: var(--primary); color: #000; }
+        .btn-discord { background: var(--discord); color: #fff; }
+
+        .btn:disabled, .btn.disabled {
+            background: var(--disabled) !important;
+            color: #94a3b8 !important;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .btn:not(:disabled):hover { transform: scale(1.02); filter: brightness(1.1); }
+
         #toast {
             visibility: hidden;
             position: fixed;
             bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: #fff;
-            padding: 12px 25px;
+            background: #334155;
+            color: white;
+            padding: 10px 20px;
             border-radius: 50px;
-            z-index: 100;
+            font-size: 0.85rem;
+            z-index: 99;
         }
-        #toast.show { visibility: visible; animation: fadeInOut 2.5s; }
-        @keyframes fadeInOut {
-            0%, 100% { opacity: 0; }
-            20%, 80% { opacity: 1; }
-        }
+        #toast.show { visibility: visible; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
     </style>
 </head>
 <body>
 
-    <div class="wrapper">
+    <div class="container">
         <header>
-            <h1><i class="fas fa-cubes"></i> SERVER NAME</h1>
-            <p style="color: var(--text-muted)">ยินดีต้อนรับสู่สังคมคุณภาพ เวอร์ชัน Bedrock</p>
-            
-            <div class="hero-buttons">
-                <a href="https://discord.gg/YOUR_INVITE" target="_blank" class="btn btn-discord">
-                    <i class="fab fa-discord"></i> Join Discord
-                </a>
-                <a href="minecraft://?addExternalServer=ServerName|PLAY.SERVER.COM:19132" class="btn btn-play">
-                    <i class="fas fa-play"></i> กดเข้าเกมทันที (Add Server)
-                </a>
-            </div>
+            <h1>เมืองปิ๊ใหม่</h1>
+            <p style="color: #94a3b8; font-size: 0.9rem;">ยินดีต้อนรับสู่เซิร์ฟเวอร์ของเรา!</p>
         </header>
 
-        <div class="section-card" style="text-align: center;">
-            <h2><i class="fas fa-network-wired"></i> ข้อมูลเซิร์ฟเวอร์</h2>
-            <div class="ip-box">
-                <span id="server-ip">PLAY.SERVER.COM:19132</span>
-                <button class="copy-btn" onclick="copyIP()">คัดลอก IP</button>
-            </div>
+        <!-- 1. กฎระเบียบ -->
+        <div class="section">
+            <h2><i class="fas fa-scroll"></i> กฎระเบียบเซิร์ฟเวอร์</h2>
+            <div class="rule-item"><i class="fas fa-check"></i> ห้ามใช้โปรแกรมโกงหรือ Mod ที่เอาเปรียบผู้อื่น</div>
+            <div class="rule-item"><i class="fas fa-check"></i> ไม่ขโมยของหรือทำลายบ้านของผู้เล่นคนอื่น</div>
+            <div class="rule-item"><i class="fas fa-check"></i> พูดคุยสุภาพและให้เกียรติสมาชิกในเซิร์ฟเวอร์</div>
         </div>
 
-        <div class="section-card">
-            <h2><i class="fas fa-book-open"></i> วิธีเข้าเซิร์ฟเวอร์ (สำหรับมือใหม่)</h2>
-            <p>หากคุณไม่ทราบว่าต้องกรอกข้อมูลตรงไหน ให้ดูตามภาพด้านล่างนี้ได้เลยครับ:</p>
+        <!-- 2. วิธีเข้าเล่น -->
+        <div class="section">
+            <h2><i class="fas fa-sign-in-alt"></i> วิธีเข้าเล่น</h2>
+            <p style="font-size: 0.9rem; margin-bottom: 5px;">1. เข้าเกม Minecraft แล้วไปที่ <b>Servers > Add Server</b></p>
+            <!-- ใส่รูปภาพสอนขั้นตอนที่ 1 ตรงนี้ -->
+            <img src="YOUR_IMAGE_1.jpg" alt="วิธีเข้าขั้นตอนที่ 1" class="tutorial-img">
             
-            <div style="margin-bottom: 20px;">
-                <p><strong>1. กดที่แท็บ Servers แล้วเลือก Add Server</strong></p>
-                <img src="YOUR_IMAGE_URL_1.jpg" alt="รูปภาพประกอบขั้นตอนที่ 1" class="tutorial-img">
-            </div>
-
-            <div>
-                <p><strong>2. กรอกข้อมูลตามช่องดังนี้</strong></p>
-                <img src="YOUR_IMAGE_URL_2.jpg" alt="รูปภาพประกอบขั้นตอนที่ 2" class="tutorial-img">
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 10px;">
-                    * ช่องบนสุด (Name) ใส่ชื่ออะไรก็ได้ <br>
-                    * ช่องกลาง (Address) ใส่ IP ที่คัดลอกด้านบน <br>
-                    * ช่องล่าง (Port) ใส่เลขพอร์ต
-                </p>
+            <p style="font-size: 0.9rem; margin-bottom: 5px;">2. กรอกข้อมูล IP และ Port ตามรูปด้านล่าง</p>
+            <!-- ใส่รูปภาพสอนขั้นตอนที่ 2 ตรงนี้ -->
+            <img src="YOUR_IMAGE_2.jpg" alt="วิธีเข้าขั้นตอนที่ 2" class="tutorial-img">
+            
+            <div class="ip-display">
+                IP: 147.185.221.223<br>
+                PORT: 12004
             </div>
         </div>
 
-        <div class="section-card">
-            <h2><i class="fas fa-map-signs"></i> เข้ามาแล้วทำยังไงต่อ?</h2>
-            <p>เมื่อเข้ามาในเซิร์ฟเวอร์ครั้งแรก คุณจะอยู่ที่จุดเกิด (Spawn) แนะนำให้ทำตามนี้:</p>
-            <ul style="color: var(--text-muted); padding-left: 20px;">
-                <li>เดินไปที่ <strong>โซนวาร์ป</strong> เพื่อเลือกไปโซนเอาชีวิตรอด</li>
-                <li>อ่านป้ายประกาศที่จุดเกิดเพื่อเช็คกิจกรรมปัจจุบัน</li>
-                <li>พิมพ์ <code>/starter</code> (ถ้ามี) เพื่อรับไอเทมเริ่มต้น</li>
-            </ul>
+        <!-- 3. กดยอมรับ -->
+        <div class="accept-box">
+            <label class="checkbox-label">
+                <input type="checkbox" id="rule-check" onchange="unlockButtons()">
+                ฉันเข้าใจและจะปฏิบัติตามกฎอย่างเคร่งครัด
+            </label>
         </div>
 
-        <div class="section-card">
-            <h2><i class="fas fa-gavel"></i> กฎของเซิร์ฟเวอร์</h2>
-            <div class="rules-grid">
-                <div class="rule-item">ห้ามใช้โปรแกรมโกง (Cheat/Hacks)</div>
-                <div class="rule-item">ห้ามก่อกวนหรือขโมยของผู้อื่น</div>
-                <div class="rule-item">ห้ามพูดจาหยาบคายหรือเหยียดหยาม</div>
-                <div class="rule-item">ห้ามโฆษณาเซิร์ฟเวอร์อื่น</div>
-            </div>
-        </div>
+        <!-- 4. ปุ่มเข้าเล่น -->
+        <div class="btn-group">
+            <button id="play-btn" class="btn btn-play" onclick="joinGame()" disabled>
+                <i class="fas fa-plus-square"></i> เพิ่มเซิร์ฟเวอร์เข้าเครื่องอัตโนมัติ
+            </button>
+            
+            <a id="discord-btn" href="https://discord.gg/e69s6FrakP" target="_blank" class="btn btn-discord disabled" onclick="return checkReady(event)">
+                <i class="fab fa-discord"></i> เข้ากลุ่ม Discord ของเซิร์ฟเวอร์
+            </a>
 
+            <p style="text-align:center; font-size: 0.8rem; color: #64748b; cursor: pointer; text-decoration: underline;" onclick="copyServerInfo()">
+                คลิกที่นี่เพื่อคัดลอก IP ไปวางเอง
+            </p>
+        </div>
     </div>
 
-    <div id="toast">✅ คัดลอก IP เรียบร้อย!</div>
+    <div id="toast">✅ คัดลอก IP และ Port เรียบร้อย!</div>
 
     <script>
-        function copyIP() {
-            const ip = document.getElementById('server-ip').innerText;
-            navigator.clipboard.writeText(ip).then(() => {
+        const SERVER_DATA = {
+            name: "MuangPiMai",
+            ip: "147.185.221.223",
+            port: 12004
+        };
+
+        function unlockButtons() {
+            const isChecked = document.getElementById('rule-check').checked;
+            const playBtn = document.getElementById('play-btn');
+            const discordBtn = document.getElementById('discord-btn');
+
+            playBtn.disabled = !isChecked;
+            if(isChecked) {
+                discordBtn.classList.remove('disabled');
+            } else {
+                discordBtn.classList.add('disabled');
+            }
+        }
+
+        function checkReady(e) {
+            const isChecked = document.getElementById('rule-check').checked;
+            if(!isChecked) {
+                e.preventDefault();
+                alert("กรุณากดยอมรับกฎก่อนนะครับ!");
+                return false;
+            }
+        }
+
+        function joinGame() {
+            const url = `minecraft://?addExternalServer=${encodeURIComponent(SERVER_DATA.name)}|${SERVER_DATA.ip}:${SERVER_DATA.port}`;
+            window.location.assign(url);
+        }
+
+        function copyServerInfo() {
+            const text = `${SERVER_DATA.ip}:${SERVER_DATA.port}`;
+            navigator.clipboard.writeText(text).then(() => {
                 const toast = document.getElementById('toast');
                 toast.className = "show";
-                setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500);
+                setTimeout(() => { toast.className = ""; }, 3000);
             });
         }
     </script>
 </body>
 </html>
-
