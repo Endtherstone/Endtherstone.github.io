@@ -1,1 +1,262 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Server | Official Website</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --primary-green: #10b981;
+            --discord-color: #5865F2;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --accent-yellow: #fbbf24;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* Container หลัก */
+        .wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* ส่วนหัว (Hero Section) */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #10b981, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        /* สไตล์ปุ่ม */
+        .btn {
+            padding: 12px 25px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-discord { background-color: var(--discord-color); color: white; }
+        .btn-play { background-color: var(--primary-green); color: white; }
+        .btn:hover { transform: translateY(-3px); filter: brightness(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+
+        /* การ์ดเนื้อหา */
+        .section-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            margin-top: 0;
+            color: var(--accent-yellow);
+        }
+
+        /* ส่วนกฎระเบียบ */
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .rule-item {
+            background: rgba(15, 23, 42, 0.4);
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-green);
+        }
+
+        /* ส่วนสอนเข้าเซิร์ฟเวอร์ */
+        .tutorial-img {
+            width: 100%;
+            border-radius: 12px;
+            margin: 15px 0;
+            border: 2px solid var(--border-color);
+            background: #000; /* พื้นหลังสีดำกรณีรูปยังไม่มา */
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* กล่อง IP */
+        .ip-box {
+            background: #000;
+            padding: 15px 20px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: monospace;
+            font-size: 1.2rem;
+            border: 1px dashed var(--primary-green);
+            margin: 20px 0;
+        }
+
+        .copy-btn {
+            background: transparent;
+            color: var(--primary-green);
+            border: 1px solid var(--primary-green);
+            padding: 5px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Prompt', sans-serif;
+            font-size: 0.8rem;
+        }
+
+        /* หน้าจอเล็ก */
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            .section-card { padding: 20px; }
+            .btn { width: 100%; justify-content: center; }
+        }
+
+        /* Toast Message */
+        #toast {
+            visibility: hidden;
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 50px;
+            z-index: 100;
+        }
+        #toast.show { visibility: visible; animation: fadeInOut 2.5s; }
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            20%, 80% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <header>
+            <h1><i class="fas fa-cubes"></i> SERVER NAME</h1>
+            <p style="color: var(--text-muted)">ยินดีต้อนรับสู่สังคมคุณภาพ เวอร์ชัน Bedrock</p>
+            
+            <div class="hero-buttons">
+                <a href="https://discord.gg/YOUR_INVITE" target="_blank" class="btn btn-discord">
+                    <i class="fab fa-discord"></i> Join Discord
+                </a>
+                <a href="minecraft://?addExternalServer=ServerName|PLAY.SERVER.COM:19132" class="btn btn-play">
+                    <i class="fas fa-play"></i> กดเข้าเกมทันที (Add Server)
+                </a>
+            </div>
+        </header>
+
+        <div class="section-card" style="text-align: center;">
+            <h2><i class="fas fa-network-wired"></i> ข้อมูลเซิร์ฟเวอร์</h2>
+            <div class="ip-box">
+                <span id="server-ip">PLAY.SERVER.COM:19132</span>
+                <button class="copy-btn" onclick="copyIP()">คัดลอก IP</button>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <h2><i class="fas fa-book-open"></i> วิธีเข้าเซิร์ฟเวอร์ (สำหรับมือใหม่)</h2>
+            <p>หากคุณไม่ทราบว่าต้องกรอกข้อมูลตรงไหน ให้ดูตามภาพด้านล่างนี้ได้เลยครับ:</p>
+            
+            <div style="margin-bottom: 20px;">
+                <p><strong>1. กดที่แท็บ Servers แล้วเลือก Add Server</strong></p>
+                <img src="YOUR_IMAGE_URL_1.jpg" alt="รูปภาพประกอบขั้นตอนที่ 1" class="tutorial-img">
+            </div>
+
+            <div>
+                <p><strong>2. กรอกข้อมูลตามช่องดังนี้</strong></p>
+                <img src="YOUR_IMAGE_URL_2.jpg" alt="รูปภาพประกอบขั้นตอนที่ 2" class="tutorial-img">
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 10px;">
+                    * ช่องบนสุด (Name) ใส่ชื่ออะไรก็ได้ <br>
+                    * ช่องกลาง (Address) ใส่ IP ที่คัดลอกด้านบน <br>
+                    * ช่องล่าง (Port) ใส่เลขพอร์ต
+                </p>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <h2><i class="fas fa-map-signs"></i> เข้ามาแล้วทำยังไงต่อ?</h2>
+            <p>เมื่อเข้ามาในเซิร์ฟเวอร์ครั้งแรก คุณจะอยู่ที่จุดเกิด (Spawn) แนะนำให้ทำตามนี้:</p>
+            <ul style="color: var(--text-muted); padding-left: 20px;">
+                <li>เดินไปที่ <strong>โซนวาร์ป</strong> เพื่อเลือกไปโซนเอาชีวิตรอด</li>
+                <li>อ่านป้ายประกาศที่จุดเกิดเพื่อเช็คกิจกรรมปัจจุบัน</li>
+                <li>พิมพ์ <code>/starter</code> (ถ้ามี) เพื่อรับไอเทมเริ่มต้น</li>
+            </ul>
+        </div>
+
+        <div class="section-card">
+            <h2><i class="fas fa-gavel"></i> กฎของเซิร์ฟเวอร์</h2>
+            <div class="rules-grid">
+                <div class="rule-item">ห้ามใช้โปรแกรมโกง (Cheat/Hacks)</div>
+                <div class="rule-item">ห้ามก่อกวนหรือขโมยของผู้อื่น</div>
+                <div class="rule-item">ห้ามพูดจาหยาบคายหรือเหยียดหยาม</div>
+                <div class="rule-item">ห้ามโฆษณาเซิร์ฟเวอร์อื่น</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="toast">✅ คัดลอก IP เรียบร้อย!</div>
+
+    <script>
+        function copyIP() {
+            const ip = document.getElementById('server-ip').innerText;
+            navigator.clipboard.writeText(ip).then(() => {
+                const toast = document.getElementById('toast');
+                toast.className = "show";
+                setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500);
+            });
+        }
+    </script>
+</body>
+</html>
 
