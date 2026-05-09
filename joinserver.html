@@ -3,212 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เมืองปิ๊ใหม่ | Minecraft Server</title>
+    <title>เมืองปิ๊ใหม่ | คู่มือเริ่มต้น</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg: #0b0f1a;
-            --card: #161e2d;
-            --primary: #00f2ff;
-            --discord: #5865F2;
-            --text: #ffffff;
-            --muted: #94a3b8;
-            --danger: #ff4d4d;
-            --success: #10b981;
+            --bg: #0f172a; --card: #1e293b; --primary: #38bdf8; --warning: #f59e0b; --danger: #ef4444; --text: #f8fafc;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            font-family: 'Prompt', sans-serif;
-            background-color: var(--bg);
-            background-image: radial-gradient(circle at 50% -20%, #1e293b 0%, transparent 50%);
-            color: var(--text);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
+            font-family: 'Prompt', sans-serif; background-color: var(--bg); color: var(--text);
+            margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center;
         }
 
-        .container { max-width: 550px; width: 100%; }
+        .container { max-width: 480px; width: 100%; }
+        header { text-align: center; margin-bottom: 25px; }
+        header h1 { font-size: 2.2rem; margin: 0; color: var(--primary); }
 
-        header { text-align: center; margin-bottom: 30px; }
-        header h1 { font-size: 2.8rem; margin: 0; background: linear-gradient(to right, var(--primary), #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 10px rgba(0,242,255,0.3)); }
-
-        .section {
-            background: var(--card);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 24px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        /* --- ไทม์ไลน์ 4 ขั้นตอนเมื่อเข้าเกม --- */
+        .roadmap { background: var(--card); border-radius: 20px; padding: 25px 20px; margin-bottom: 20px; border-left: 4px solid var(--primary); }
+        .roadmap-title { font-size: 1.1rem; font-weight: 600; color: var(--primary); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        
+        .step { display: flex; gap: 15px; margin-bottom: 20px; position: relative; }
+        .step:last-child { margin-bottom: 0; }
+        .step-icon { 
+            width: 35px; height: 35px; background: rgba(56, 189, 248, 0.1); color: var(--primary); 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0;
+            border: 1px solid rgba(56, 189, 248, 0.3);
         }
+        .step-text h4 { margin: 0 0 5px 0; font-size: 1rem; color: #fff; }
+        .step-text p { margin: 0; font-size: 0.85rem; color: #94a3b8; line-height: 1.4; }
 
-        h2 { font-size: 1.2rem; margin-top: 0; color: var(--primary); display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        /* --- กล่องคำเตือน (กฎเหล็ก) --- */
+        .alert-box { background: rgba(239, 68, 68, 0.1); border: 1px dashed var(--danger); padding: 15px; border-radius: 15px; margin-bottom: 20px; }
+        .alert-box h4 { margin: 0 0 8px 0; color: var(--danger); font-size: 0.95rem; }
+        .alert-box ul { margin: 0; padding-left: 20px; font-size: 0.85rem; color: #fca5a5; }
 
-        .rule-item { display: flex; gap: 12px; margin-bottom: 15px; font-size: 0.95rem; line-height: 1.5; }
-        .rule-item i { color: var(--primary); margin-top: 4px; font-size: 1rem; }
-        .rule-item b { color: var(--danger); }
+        /* --- โซนกดเข้าเกม --- */
+        .action-area { background: var(--card); padding: 20px; border-radius: 20px; text-align: center; }
+        .checkbox-label { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; cursor: pointer; font-size: 0.9rem; }
+        input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary); }
 
-        .highlight-box {
-            background: rgba(0, 242, 255, 0.05);
-            border: 1px dashed var(--primary);
-            padding: 15px;
-            border-radius: 15px;
-            margin: 15px 0;
-            text-align: center;
+        .btn-play {
+            width: 100%; padding: 16px; border-radius: 12px; border: none;
+            background: linear-gradient(to right, #0ea5e9, #38bdf8); color: #000;
+            font-family: 'Prompt', sans-serif; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: 0.3s;
         }
+        .btn-play:disabled { background: #334155; color: #94a3b8; cursor: not-allowed; }
+        .btn-play:not(:disabled):hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(56, 189, 248, 0.4); }
 
-        .status-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 15px;
-            text-align: center;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-        }
+        .help-toggle { background: none; border: none; color: var(--primary); margin-top: 15px; cursor: pointer; font-family: 'Prompt', sans-serif; text-decoration: underline; font-size: 0.9rem; }
+        .help-content { display: none; margin-top: 15px; text-align: left; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; }
+        .help-content.active { display: block; }
+        .tutorial-img { width: 100%; border-radius: 8px; margin-top: 10px; }
 
-        .accept-area {
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            background: rgba(255,255,255,0.05);
-            padding: 20px;
-            border-radius: 100px;
-            cursor: pointer;
-            transition: 0.3s;
-            border: 2px solid transparent;
-        }
-        .accept-area:hover { background: rgba(255,255,255,0.1); border-color: var(--primary); }
-        input[type="checkbox"] { width: 24px; height: 24px; accent-color: var(--primary); cursor: pointer; }
-
-        .button-stack { display: flex; flex-direction: column; gap: 15px; }
-
-        .main-btn {
-            width: 100%;
-            padding: 22px;
-            border-radius: 20px;
-            border: none;
-            color: white;
-            font-family: 'Prompt', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            text-decoration: none;
-        }
-
-        .btn-play { background: linear-gradient(45deg, #0088ff, var(--primary)); box-shadow: 0 5px 20px rgba(0, 242, 255, 0.3); }
-        .btn-discord { background: var(--discord); box-shadow: 0 5px 20px rgba(88, 101, 242, 0.3); }
-
-        .main-btn:disabled, .main-btn.disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; transform: none !important; filter: grayscale(1); }
-        .main-btn:not(:disabled):hover { transform: translateY(-5px); filter: brightness(1.1); }
-
-        #toast {
-            visibility: hidden; position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: #fff; color: #000; padding: 12px 30px; border-radius: 50px; font-weight: 600; z-index: 1000;
-        }
-        #toast.show { visibility: visible; animation: dropIn 0.5s; }
-        @keyframes dropIn { from {top: -50px; opacity: 0;} to {top: 20px; opacity: 1;} }
+        #tiktok-warn { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.95); z-index: 9999; padding: 40px 20px; text-align: center; }
+        .warn-box { background: var(--card); padding: 30px; border-radius: 20px; border: 2px solid #3b82f6; margin-top: 50px; }
+        
+        #toast { visibility: hidden; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 10px 20px; border-radius: 50px; font-weight: 600; z-index: 1000; }
+        #toast.show { visibility: visible; }
     </style>
 </head>
 <body>
 
+    <div id="tiktok-warn">
+        <div class="warn-box">
+            <i class="fas fa-compass" style="font-size: 3rem; color: #3b82f6; margin-bottom: 15px;"></i>
+            <h3>กดจุด 3 จุดมุมขวาบน</h3>
+            <p>เลือก <b>"เปิดด้วยเบราว์เซอร์"</b><br>เพื่อเข้าเกมนะครับ</p>
+        </div>
+    </div>
+
     <div class="container">
         <header>
             <h1>เมืองปิ๊ใหม่</h1>
-            <div style="color: var(--primary); font-weight: 600; letter-spacing: 2px;">MINECRAFT CREATIVE CITY</div>
+            <p style="margin:0; color: #94a3b8; font-size: 0.9rem;">เซิร์ฟปิด 22:00 น. | เปิดตามใจแอดมิน</p>
         </header>
 
-        <!-- ส่วนของเทศบาล -->
-        <div class="section">
-            <h2><i class="fas fa-landmark"></i> ขั้นตอนการขอพื้นที่ (เทศบาล)</h2>
-            <div class="rule-item">
-                <i class="fas fa-walking"></i>
-                <span>เมื่อเข้าเกมมาแล้ว ให้เดินทางมาที่ <b>"เทศบาลประจำเมือง"</b> ที่จุดสปาวน์</span>
+        <!-- แผนที่นำทางผู้เล่น (สำคัญมาก) -->
+        <div class="roadmap">
+            <div class="roadmap-title"><i class="fas fa-map-marked-alt"></i> สิ่งที่ต้องทำเมื่อเข้าเกม</div>
+            
+            <div class="step">
+                <div class="step-icon"><i class="fas fa-shield-alt"></i></div>
+                <div class="step-text">
+                    <h4>1. อยู่ในโหมด Adventure</h4>
+                    <p>เมื่อเกิดมาคุณจะยังทุบหรือวางบล็อกไม่ได้ ให้เดินตามทางไปที่จุดศูนย์กลาง</p>
+                </div>
             </div>
-            <div class="rule-item">
-                <i class="fas fa-pen-nib"></i>
-                <span><b>เขียนคำขอ:</b> เขียนป้ายหรือลงชื่อในสมุดที่เทศบาลเตรียมไว้ เพื่อแจ้งความประสงค์ขอพื้นที่</span>
+            
+            <div class="step">
+                <div class="step-icon"><i class="fas fa-landmark"></i></div>
+                <div class="step-text">
+                    <h4>2. ไปที่ "เทศบาล"</h4>
+                    <p>หาป้ายหรือสมุดลงชื่อที่เทศบาล เพื่อเขียนคำขอที่ดินสำหรับสร้างบ้าน</p>
+                </div>
             </div>
-            <div class="rule-item">
-                <i class="fas fa-comments"></i>
-                <span><b>คุยในเกม:</b> รอ Admin มาพูดคุยสอบถามแนวทางการสร้าง เพื่อพาไปเลือกทำเลที่ถูกใจ</span>
+
+            <div class="step">
+                <div class="step-icon"><i class="fas fa-comments"></i></div>
+                <div class="step-text">
+                    <h4>3. รอคุยกับ Admin</h4>
+                    <p>Admin จะสอบถามและพาไปดูพื้นที่ พร้อมกับทำระบบ Claim ที่ดินให้คุณ</p>
+                </div>
             </div>
-            <div class="highlight-box">
-                <i class="fas fa-exclamation-circle"></i> ต้องได้รับการ Claim พื้นที่จาก Admin ก่อนเท่านั้นถึงจะเริ่มสร้างได้!
+
+            <div class="step">
+                <div class="step-icon" style="color: #10b981; border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.1);"><i class="fas fa-hammer"></i></div>
+                <div class="step-text">
+                    <h4 style="color: #10b981;">4. ได้สิทธิ์สร้างเมือง!</h4>
+                    <p>เมื่อได้พื้นที่ของตัวเองแล้ว คุณถึงจะสามารถทุบ วาง และสร้างบ้านได้ครับ</p>
+                </div>
             </div>
         </div>
 
-        <!-- กฎเพิ่มเติมในเกม -->
-        <div class="section">
-            <h2><i class="fas fa-gavel"></i> กฎเพิ่มเติมภายในเกม</h2>
-            <div class="rule-item">
-                <i class="fas fa-ban"></i>
-                <span><b>ห้ามแอบสร้าง:</b> ห้ามแอบไปสร้างบ้านในป่าหรือที่รกร้างนอกเขตเมืองโดยไม่ขอ <b>(ตรวจเจอแบนทันที)</b></span>
-            </div>
-            <div class="rule-item">
-                <i class="fas fa-user-shield"></i>
-                <span><b>การเกรียน:</b> ห้ามทุบของคนอื่น หรือวางบล็อกก่อกวนเด็ดขาด <b>(แบนถาวร ไม่มีการปลด)</b></span>
-            </div>
-            <div class="rule-item">
-                <i class="fas fa-expand-arrows-alt"></i>
-                <span><b>การขยายพื้นที่:</b> สามารถขอเพิ่มได้เรื่อยๆ แต่พื้นที่เก่าต้องสร้างให้เสร็จและดูดีก่อน</span>
-            </div>
+        <!-- กฎเหล็กแบบกระแทกตา -->
+        <div class="alert-box">
+            <h4><i class="fas fa-exclamation-triangle"></i> กฎเหล็ก (ฝ่าฝืน = แบนถาวร)</h4>
+            <ul>
+                <li>ห้ามแอบไปสร้างในป่า หรือนอกเขตเมืองเด็ดขาด</li>
+                <li>ห้ามทุบทำลาย หรือก่อกวนพื้นที่ของคนอื่น</li>
+                <li>สิทธิ์ขยายพื้นที่ ขอเพิ่มได้ถ้าสร้างที่เก่าเสร็จแล้ว</li>
+            </ul>
         </div>
 
-        <div class="status-card">
-            <i class="fas fa-clock"></i> เซิร์ฟเวอร์ปิด 22:00 น. | เปิดตามใจเจ้าของเซิร์ฟ
-        </div>
+        <!-- โซนปุ่มกด -->
+        <div class="action-area">
+            <label class="checkbox-label">
+                <input type="checkbox" onchange="document.getElementById('playBtn').disabled = !this.checked">
+                เข้าใจแล้ว ว่าเข้าเกมไปต้องไปเทศบาล!
+            </label>
 
-        <label class="accept-area">
-            <input type="checkbox" id="check" onchange="toggleButtons(this.checked)">
-            <span>ฉันเข้าใจกฎ และจะไปเขียนคำขอที่เทศบาล</span>
-        </label>
-
-        <div class="button-stack">
-            <button id="playBtn" class="main-btn btn-play" onclick="magicJoin()" disabled>
-                <i class="fas fa-play-circle"></i> เข้าเล่นเซิร์ฟเวอร์
+            <button id="playBtn" class="btn-play" onclick="magicJoin()" disabled>
+                <i class="fas fa-play"></i> เข้าเกมทันที
             </button>
 
-            <a id="discordBtn" href="https://discord.gg/e69s6FrakP" target="_blank" class="main-btn btn-discord disabled">
-                <i class="fab fa-discord"></i> เข้ากลุ่ม Discord
-            </a>
-        </div>
+            <!-- เมนูซ่อนวิธีแอดเซิร์ฟเวอร์ -->
+            <button class="help-toggle" onclick="document.getElementById('helpContent').classList.toggle('active')">
+                ระบบไม่ยอมแอดเซิร์ฟเวอร์ให้? (ดูวิธีแก้)
+            </button>
+            <div class="help-content" id="helpContent">
+                <p style="font-size: 0.85rem; color: #cbd5e1; margin:0;">
+                    ระบบก๊อปปี้ IP <b>(147.185.221.223)</b> ไว้ให้คุณแล้ว<br>
+                    1. เข้าเกมไปที่เมนู <b>Add Server</b><br>
+                    2. ช่อง Server Address ให้กดแช่แล้ว <b>วาง (Paste)</b><br>
+                    3. ช่อง Port ใส่เลข <b>12004</b>
+                </p>
+                <!-- ใส่ภาพประกอบตรงนี้ 1 ภาพ -->
+                <img src="https://via.placeholder.com/400x200?text=ภาพสอนกรอก+IP+และ+Port" class="tutorial-img">
+            </div>
 
-        <p style="text-align: center; color: var(--muted); font-size: 0.75rem; margin-top: 25px;">
-            IP: 147.185.221.223 | Port: 12004
-        </p>
+            <div style="margin-top: 20px;">
+                <a href="https://discord.gg/e69s6FrakP" target="_blank" style="color: #5865F2; text-decoration: none; font-size: 0.9rem; font-weight: 600;">
+                    <i class="fab fa-discord"></i> เข้ากลุ่ม Discord ไว้ตามแอดมิน
+                </a>
+            </div>
+        </div>
     </div>
 
-    <div id="toast">📋 คัดลอก IP เรียบร้อย... กำลังพาเข้าเกม!</div>
+    <div id="toast">📋 ก๊อปปี้ IP ไว้ให้แล้ว นำไปวางในเกมได้เลย!</div>
 
     <script>
-        const SERVER = { name: "เมืองปิ๊ใหม่", ip: "147.185.221.223", port: 12004 };
-
-        function toggleButtons(isChecked) {
-            const playBtn = document.getElementById('playBtn');
-            const discordBtn = document.getElementById('discordBtn');
-            playBtn.disabled = !isChecked;
-            if(isChecked) { discordBtn.classList.remove('disabled'); } 
-            else { discordBtn.classList.add('disabled'); }
+        if (/TikTok/i.test(navigator.userAgent)) {
+            document.getElementById('tiktok-warn').style.display = 'block';
         }
 
+        const SERVER = { ip: "147.185.221.223", port: 12004, name: "เมืองปิ๊ใหม่" };
+
         function magicJoin() {
-            navigator.clipboard.writeText(`${SERVER.ip}:${SERVER.port}`);
+            navigator.clipboard.writeText(SERVER.ip);
             const toast = document.getElementById('toast');
             toast.className = "show";
+
             setTimeout(() => {
-                const nameEncoded = encodeURIComponent(SERVER.name);
-                const minecraftUrl = `minecraft://?addExternalServer=${nameEncoded}%7C${SERVER.ip}:${SERVER.port}`;
-                window.location.assign(minecraftUrl);
-                setTimeout(() => { toast.className = ""; }, 3000);
+                const url = `minecraft://?addExternalServer=${encodeURIComponent(SERVER.name)}%7C${SERVER.ip}:${SERVER.port}`;
+                window.location.assign(url);
+                setTimeout(() => { toast.className = ""; }, 4000);
             }, 600);
         }
     </script>
