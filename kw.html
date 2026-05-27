@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+  <title>เกมตอบคำถามวิทยาศาสตร์</title>
+  <style>
+    body {
+      font-family: "Prompt", sans-serif;
+      background: #f4f7fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      width: 500px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-size: 22px;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+      padding: 12px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn:hover { background: #2980b9; }
+    .correct { background: #2ecc71 !important; }
+    .wrong { background: #e74c3c !important; }
+    #next-btn {
+      margin-top: 15px;
+      background: #8e44ad;
+      display: none;
+    }
+    #timer {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #e67e22;
+      font-weight: bold;
+    }
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 6px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <!-- หน้ากรอกข้อมูล -->
+  <div class="container" id="form-container">
+    <h1>กรอกข้อมูลก่อนเล่นเกม</h1>
+    <input type="text" id="fullname" placeholder="ชื่อ - นามสกุล">
+    <input type="text" id="class" placeholder="ชั้น">
+    <input type="number" id="number" placeholder="เลขที่">
+    <button class="btn" onclick="startGame()">เริ่มเกม</button>
+  </div>
+
+  <!-- หน้าคำถาม -->
+  <div class="container" id="quiz-container" style="display:none;">
+    <div id="timer">เวลาที่เหลือ: 10 วิ</div>
+    <h1 id="question">คำถามจะแสดงตรงนี้</h1>
+    <div id="answer-buttons"></div>
+    <button id="next-btn" class="btn">ข้อถัดไป</button>
+  </div>
+
+  <!-- หน้าสรุป -->
+  <div class="container" id="result-container" style="display:none;">
+    <h1>สรุปผลคะแนน</h1>
+    <p id="student-info"></p>
+    <p id="final-score"></p>
+    <button class="btn" onclick="restartGame()">เล่นใหม่</button>
+  </div>
+
+  <script>
+    // ===== คำถามวิทยาศาสตร์ (20 ข้อ) =====
+    const questions = [
+      { question: "น้ำประกอบด้วยธาตุใดบ้าง?", answers: [
+        { text: "ไฮโดรเจนและออกซิเจน", correct: true },
+        { text: "ไฮโดรเจนและไนโตรเจน", correct: false },
+        { text: "คาร์บอนและออกซิเจน", correct: false },
+        { text: "ไนโตรเจนและออกซิเจน", correct: false }
+      ]},
+      { question: "เซลล์ใดในร่างกายมนุษย์ไม่มีนิวเคลียส?", answers: [
+        { text: "เม็ดเลือดขาว", correct: false },
+        { text: "เซลล์กล้ามเนื้อ", correct: false },
+        { text: "เม็ดเลือดแดง", correct: true },
+        { text: "เซลล์ประสาท", correct: false }
+      ]},
+      { question: "แรงที่ทำให้วัตถุตกลงสู่พื้นคือแรงใด?", answers: [
+        { text: "แรงเสียดทาน", correct: false },
+        { text: "แรงโน้มถ่วง", correct: true },
+        { text: "แรงแม่เหล็ก", correct: false },
+        { text: "แรงลอยตัว", correct: false }
+      ]},
+      { question: "หน่วยของพลังงานคืออะไร?", answers: [
+        { text: "นิวตัน", correct: false },
+        { text: "จูล", correct: true },
+        { text: "วัตต์", correct: false },
+        { text: "แอมแปร์", correct: false }
+      ]},
+      { question: "พืชสร้างอาหารเองโดยกระบวนการใด?", answers: [
+        { text: "การสังเคราะห์ด้วยแสง", correct: true },
+        { text: "การหายใจระดับเซลล์", correct: false },
+        { text: "การหมัก", correct: false },
+        { text: "การสังเคราะห์โปรตีน", correct: false }
+      ]},
+      { question: "ดาวเคราะห์ดวงใดใหญ่ที่สุดในระบบสุริยะ?", answers: [
+        { text: "ดาวพฤหัสบดี", correct: true },
+        { text: "ดาวเสาร์", correct: false },
+        { text: "โลก", correct: false },
+        { text: "ดาวศุกร์", correct: false }
+      ]},
+      { question: "เสียงเดินทางได้เร็วที่สุดในสภาพใด?", answers: [
+        { text: "สูญญากาศ", correct: false },
+        { text: "ของแข็ง", correct: true },
+        { text: "ของเหลว", correct: false },
+        { text: "ก๊าซ", correct: false }
+      ]},
+      { question: "โครงสร้างใดควบคุมการทำงานของเซลล์?", answers: [
+        { text: "นิวเคลียส", correct: true },
+        { text: "ไมโตคอนเดรีย", correct: false },
+        { text: "ไรโบโซม", correct: false },
+        { text: "ไซโทพลาซึม", correct: false }
+      ]},
+      { question: "ธาตุใดเป็นก๊าซมีตระกูล?", answers: [
+        { text: "ไนโตรเจน", correct: false },
+        { text: "ฮีเลียม", correct: true },
+        { text: "ไฮโดรเจน", correct: false },
+        { text: "ออกซิเจน", correct: false }
+      ]},
+      { question: "พลังงานไฟฟ้ามีหน่วยวัดว่าอะไร?", answers: [
+        { text: "โวลต์", correct: false },
+        { text: "แอมแปร์", correct: false },
+        { text: "กิโลวัตต์-ชั่วโมง", correct: true },
+        { text: "นิวตัน", correct: false }
+      ]},
+      { question: "กระดูกชิ้นใดปกป้องสมอง?", answers: [
+        { text: "กระดูกซี่โครง", correct: false },
+        { text: "กะโหลกศีรษะ", correct: true },
+        { text: "กระดูกสันหลัง", correct: false },
+        { text: "กระดูกเชิงกราน", correct: false }
+      ]},
+      { question: "ชั้นบรรยากาศที่มีโอโซนมากที่สุดคือ?", answers: [
+        { text: "โทรโพสเฟียร์", correct: false },
+        { text: "สตราโตสเฟียร์", correct: true },
+        { text: "มีโซสเฟียร์", correct: false },
+        { text: "เทอร์โมสเฟียร์", correct: false }
+      ]},
+      { question: "เซลล์ใดทำหน้าที่สืบพันธุ์?", answers: [
+        { text: "เม็ดเลือดแดง", correct: false },
+        { text: "เซลล์ประสาท", correct: false },
+        { text: "เซลล์สืบพันธุ์", correct: true },
+        { text: "เซลล์กล้ามเนื้อ", correct: false }
+      ]},
+      { question: "แหล่งพลังงานทดแทนใดเกิดจากการหมุนของใบพัด?", answers: [
+        { text: "พลังงานลม", correct: true },
+        { text: "พลังงานแสงอาทิตย์", correct: false },
+        { text: "พลังงานชีวมวล", correct: false },
+        { text: "พลังงานน้ำ", correct: false }
+      ]},
+      { question: "ตาของคนทำงานโดยการรับแสงที่ตกกระทบที่?", answers: [
+        { text: "ม่านตา", correct: false },
+        { text: "เลนส์ตา", correct: false },
+        { text: "จอประสาทตา", correct: true },
+        { text: "กระจกตา", correct: false }
+      ]},
+      { question: "ก๊าซใดที่ใช้ในการหายใจของมนุษย์?", answers: [
+        { text: "ออกซิเจน", correct: true },
+        { text: "คาร์บอนไดออกไซด์", correct: false },
+        { text: "ไนโตรเจน", correct: false },
+        { text: "ฮีเลียม", correct: false }
+      ]},
+      { question: "ในระบบสุริยะ โลกอยู่ลำดับที่เท่าไหร่จากดวงอาทิตย์?", answers: [
+        { text: "อันดับ 2", correct: false },
+        { text: "อันดับ 3", correct: true },
+        { text: "อันดับ 4", correct: false },
+        { text: "อันดับ 5", correct: false }
+      ]},
+      { question: "โรคใดเกิดจากเชื้อไวรัส?", answers: [
+        { text: "ไข้หวัดใหญ่", correct: true },
+        { text: "มาลาเรีย", correct: false },
+        { text: "วัณโรค", correct: false },
+        { text: "บาดทะยัก", correct: false }
+      ]},
+      { question: "พลังงานจากดวงอาทิตย์คือพลังงานใด?", answers: [
+        { text: "พลังงานแสงและความร้อน", correct: true },
+        { text: "พลังงานไฟฟ้า", correct: false },
+        { text: "พลังงานกล", correct: false },
+        { text: "พลังงานนิวเคลียร์", correct: false }
+      ]},
+      { question: "การละลายน้ำตาลในน้ำเป็นการเปลี่ยนแปลงแบบใด?", answers: [
+        { text: "การเปลี่ยนแปลงทางกายภาพ", correct: true },
+        { text: "การเปลี่ยนแปลงทางเคมี", correct: false },
+        { text: "การสังเคราะห์", correct: false },
+        { text: "การย่อยสลาย", correct: false }
+      ]}
+    ];
+
+    // ===== ตัวแปร =====
+    const questionElement = document.getElementById("question");
+    const answerButtons = document.getElementById("answer-buttons");
+    const nextButton = document.getElementById("next-btn");
+    const timerElement = document.getElementById("timer");
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timeLeft = 10;
+    let timer;
+    let studentInfo = {};
+
+    // ===== ฟังก์ชัน =====
+    function startGame() {
+      studentInfo.fullname = document.getElementById("fullname").value;
+      studentInfo.class = document.getElementById("class").value;
+      studentInfo.number = document.getElementById("number").value;
+
+      if (!studentInfo.fullname || !studentInfo.class || !studentInfo.number) {
+        alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+        return;
+      }
+
+      document.getElementById("form-container").style.display = "none";
+      document.getElementById("quiz-container").style.display = "block";
+      startQuiz();
+    }
+
+    function startQuiz() {
+      currentQuestionIndex = 0;
+      score = 0;
+      nextButton.innerText = "ข้อถัดไป";
+      showQuestion();
+    }
+
+    function startTimer() {
+      timeLeft = 10;
+      timerElement.innerText = `เวลาที่เหลือ: ${timeLeft} วิ`;
+      clearInterval(timer);
+      timer = setInterval(() => {
+        timeLeft--;
+        timerElement.innerText = `เวลาที่เหลือ: ${timeLeft} วิ`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          lockAnswers();
+          nextButton.style.display = "block";
+        }
+      }, 1000);
+    }
+
+    function showQuestion() {
+      resetState();
+      startTimer();
+      let currentQuestion = questions[currentQuestionIndex];
+      questionElement.innerText = currentQuestion.question;
+
+      currentQuestion.answers.forEach(answer => {
+        const button = document.createElement("button");
+        button.innerText = answer.text;
+        button.classList.add("btn");
+        button.addEventListener("click", () => selectAnswer(button, answer));
+        answerButtons.appendChild(button);
+      });
+    }
+
+    function resetState() {
+      nextButton.style.display = "none";
+      while (answerButtons.firstChild) {
+        answerButtons.removeChild(answerButtons.firstChild);
+      }
+    }
+
+    function selectAnswer(button, answer) {
+      clearInterval(timer);
+      const correct = answer.correct;
+      if (correct) {
+        button.classList.add("correct");
+        score++;
+      } else {
+        button.classList.add("wrong");
+      }
+      lockAnswers();
+      nextButton.style.display = "block";
+    }
+
+    function lockAnswers() {
+      Array.from(answerButtons.children).forEach(btn => {
+        btn.disabled = true;
+        if (questions[currentQuestionIndex].answers.find(a => a.text === btn.innerText).correct) {
+          btn.classList.add("correct");
+        }
+      });
+    }
+
+    function showScore() {
+      resetState();
+      clearInterval(timer);
+      document.getElementById("quiz-container").style.display = "none";
+      document.getElementById("result-container").style.display = "block";
+      document.getElementById("student-info").innerText =
+        `ชื่อ: ${studentInfo.fullname} | ชั้น: ${studentInfo.class} | เลขที่: ${studentInfo.number}`;
+      document.getElementById("final-score").innerText =
+        `คุณได้คะแนน ${score} จาก ${questions.length} ข้อ 🎉`;
+    }
+
+    function handleNextButton() {
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) {
+        showQuestion();
+      } else {
+        showScore();
+      }
+    }
+
+    nextButton.addEventListener("click", () => {
+      if (currentQuestionIndex < questions.length) {
+        handleNextButton();
+      } else {
+        showScore();
+      }
+    });
+
+    function restartGame() {
+      document.getElementById("result-container").style.display = "none";
+      document.getElementById("form-container").style.display = "block";
+    }
+  </script>
+</body>
+</html>
