@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เมืองปิ๊ใหม่ | คู่มือเริ่มต้นสำหรับมือใหม่</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #020617; --bg-light: #0f172a; 
+            --card-bg: rgba(30, 41, 59, 0.7); 
+            --primary: #38bdf8; --primary-glow: rgba(56, 189, 248, 0.4);
+            --warning: #fbbf24; --danger: #f87171; --success: #34d399; 
+            --text: #f8fafc; --text-muted: #94a3b8;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Prompt', sans-serif; 
+            background: linear-gradient(135deg, var(--bg-light) 0%, var(--bg-dark) 100%);
+            color: var(--text);
+            margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh;
+        }
+
+        .container { max-width: 500px; width: 100%; margin-top: 20px; }
+        
+        header { text-align: center; margin-bottom: 30px; }
+        header h1 { font-size: 2.5rem; margin: 0; color: #fff; text-shadow: 0 0 15px var(--primary-glow); letter-spacing: 1px; }
+        header h1 span { color: var(--primary); }
+        .subtitle { margin: 8px 0 0 0; color: var(--text-muted); font-size: 0.95rem; font-weight: 300; }
+
+        /* --- ปุ่มเปิดคู่มือตัวเต็ม --- */
+        .full-guide-btn {
+            background: rgba(56, 189, 248, 0.05); border: 1px dashed var(--primary);
+            color: var(--primary); width: 100%; padding: 14px; border-radius: 14px;
+            font-family: 'Prompt', sans-serif; font-size: 0.95rem; font-weight: 500;
+            cursor: pointer; margin-bottom: 25px; transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .full-guide-btn:hover { background: rgba(56, 189, 248, 0.15); box-shadow: 0 0 15px var(--primary-glow); transform: translateY(-2px); }
+
+        /* --- แถบ Progress บอกสถานะ --- */
+        .progress-container { display: flex; justify-content: space-between; margin-bottom: 30px; position: relative; padding: 0 10px; }
+        .progress-bar-line { position: absolute; top: 50%; left: 10px; right: 10px; transform: translateY(-50%); height: 3px; background: rgba(255,255,255,0.1); z-index: 1; border-radius: 10px; }
+        .progress-line-active { position: absolute; top: 50%; left: 10px; transform: translateY(-50%); height: 3px; background: var(--primary); width: 0%; z-index: 2; transition: 0.4s ease; border-radius: 10px; box-shadow: 0 0 10px var(--primary-glow); }
+        .progress-step { width: 38px; height: 38px; background: #0f172a; border: 2px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; z-index: 3; transition: all 0.3s; font-size: 1rem; color: var(--text-muted); }
+        .progress-step.active { border-color: var(--primary); color: var(--primary); box-shadow: 0 0 15px var(--primary-glow); }
+        .progress-step.completed { border-color: var(--success); color: #000; background: var(--success); box-shadow: 0 0 15px rgba(52, 211, 153, 0.4); }
+
+        /* --- แผงเนื้อหา (ทีละหน้า) --- */
+        .panel { 
+            background: var(--card-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px; padding: 28px; margin-bottom: 20px; display: none; 
+            border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 40px rgba(0,0,0,0.4); 
+        }
+        .panel.active { display: block; animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .panel-title { font-size: 1.2rem; font-weight: 600; color: #fff; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px; }
+        .panel-title i { color: var(--primary); font-size: 1.4rem; }
+        
+        /* --- วิดีโอและรูปภาพประกอบ --- */
+        .media-container { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 16px; margin: 15px 0; border: 1px solid rgba(255,255,255,0.05); }
+        .tutorial-img { width: 100%; border-radius: 10px; display: block; margin-bottom: 10px; }
+        .tutorial-img:last-child { margin-bottom: 0; }
+        .video-box { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; background: #000; }
+        .video-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+
+        /* --- ข้อความและกล่องแจ้งเตือน --- */
+        .instruction-text { font-size: 0.95rem; line-height: 1.7; color: #cbd5e1; margin: 0 0 15px 0; font-weight: 300; }
+        .instruction-text b { color: #fff; font-weight: 500; }
+        
+        .alert-zone { background: linear-gradient(to right, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.05)); border-left: 4px solid var(--danger); padding: 15px; border-radius: 0 12px 12px 0; margin-bottom: 18px; }
+        .alert-zone ul { margin: 0; padding-left: 20px; font-size: 0.9rem; color: #fecaca; line-height: 1.6; }
+        .alert-zone li { margin-bottom: 5px; }
+        
+        .highlight-box { background: linear-gradient(to right, rgba(251, 191, 36, 0.15), rgba(251, 191, 36, 0.05)); border-left: 4px solid var(--warning); padding: 15px; border-radius: 0 12px 12px 0; margin-bottom: 18px; }
+        .highlight-box h5 { margin: 0 0 8px 0; color: var(--warning); font-size: 1rem; font-weight: 500; }
+        .highlight-box p { margin: 0; font-size: 0.9rem; color: #fef3c7; line-height: 1.6; }
+
+        /* --- ปุ่มนำทาง --- */
+        .btn-nav {
+            width: 100%; padding: 16px; border-radius: 14px; border: none;
+            background: linear-gradient(135deg, #0ea5e9, #2563eb); color: #fff;
+            font-family: 'Prompt', sans-serif; font-size: 1.05rem; font-weight: 500; cursor: pointer; transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px;
+        }
+        .btn-nav:disabled { background: #1e293b; color: #64748b; cursor: not-allowed; box-shadow: none; border: 1px solid rgba(255,255,255,0.05); }
+        .btn-nav:not(:disabled):hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(14, 165, 233, 0.4); }
+        
+        .btn-play { background: linear-gradient(135deg, #10b981, #059669); font-size: 1.1rem; font-weight: 600; }
+        .btn-play:not(:disabled):hover { box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4); }
+
+        /* --- หน้าต่างโหมดคู่มือตัวเต็ม --- */
+        .full-guide-view { display: none; background: var(--card-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 24px; padding: 30px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .full-guide-view.active { display: block; animation: slideUp 0.5s ease; }
+        .close-guide-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; width: 100%; padding: 14px; border-radius: 14px; font-family: 'Prompt', sans-serif; font-weight: 500; cursor: pointer; margin-top: 25px; transition: 0.3s; }
+        .close-guide-btn:hover { background: rgba(255,255,255,0.2); }
+
+        #tiktok-warn { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2,6,23,0.95); backdrop-filter: blur(5px); z-index: 9999; padding: 40px 20px; text-align: center; }
+        .warn-box { background: var(--card-bg); padding: 40px 30px; border-radius: 24px; border: 1px solid #3b82f6; margin-top: 50px; box-shadow: 0 0 30px rgba(59, 130, 246, 0.3); }
+        
+        #toast { visibility: hidden; position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(255,255,255,0.95); color: #000; padding: 12px 25px; border-radius: 50px; font-weight: 600; z-index: 1000; box-shadow: 0 10px 25px rgba(0,0,0,0.5); transition: all 0.3s ease; opacity: 0; }
+        #toast.show { visibility: visible; transform: translateX(-50%) translateY(0); opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <div id="tiktok-warn">
+        <div class="warn-box">
+            <i class="fas fa-compass" style="font-size: 3.5rem; color: #3b82f6; margin-bottom: 20px;"></i>
+            <h3 style="margin:0 0 10px 0; font-size:1.5rem;">กดจุด 3 จุดมุมขวาบน</h3>
+            <p style="color:#cbd5e1; font-weight:300;">เลือก <b>"เปิดด้วยเบราว์เซอร์"</b><br>เพื่อเข้าเกมนะครับ</p>
+        </div>
+    </div>
+
+    <div class="container" id="mainContainer">
+        <header>
+            <h1>เมือง<span>ปิ๊ใหม่</span></h1>
+            <p class="subtitle">เซิร์ฟปิด 22:00 น. | เปิดตามใจแอดมิน</p>
+        </header>
+
+        <button class="full-guide-btn" onclick="openFullGuide()">
+            <i class="fas fa-book-open"></i> เปิดดูคู่มือฉบับเต็ม (หน้าเดียวจบ)
+        </button>
+
+        <div id="interactiveMode">
+            <div class="progress-container">
+                <div class="progress-bar-line"></div>
+                <div class="progress-line-active" id="progressLine"></div>
+                <div class="progress-step active">1</div>
+                <div class="progress-step">2</div>
+                <div class="progress-step">3</div>
+            </div>
+
+            <div class="panel active" id="panel1">
+                <div class="panel-title"><i class="fas fa-server"></i> STEP 1: เพิ่มเซิร์ฟเวอร์</div>
+                <p class="instruction-text">
+                    เปิดเกม Minecraft บนมือถือหรือคอมพิวเตอร์ของคุณ แล้วทำตามลำดับในรูปภาพด้านล่างนี้เลยครับ:
+                </p>
+                <div class="media-container">
+                    <img src="1s.jpg" class="tutorial-img" alt="กดปุ่ม Play และเลือกแถบ Servers">
+                    <img src="2s.jpg" class="tutorial-img" alt="เลื่อนลงมาล่างสุดแล้วกดปุ่ม Add Server">
+                    <img src="3s.jpg" class="tutorial-img" alt="กรอก IP และ Port ในช่องที่กำหนด">
+                    <img src="4s.jpg" class="tutorial-img" alt="กรอกตามนี้">
+                </div>
+                <div class="highlight-box">
+                    <h5><i class="fas fa-copy"></i> ข้อมูลเซิร์ฟเวอร์ (ระบบจะก๊อปให้อัตโนมัติหน้าสุดท้าย)</h5>
+                    <p>• <b>Server Name:</b> เมืองปิ๊ใหม่<br>
+                       • <b>Server Address (IP):</b> 147.185.221.223<br>
+                       • <b>Port:</b> 12004</p>
+                </div>
+                <button class="btn-nav" id="btnNext1" onclick="nextPanel(2)" disabled>
+                    อ่านวิธีแอดเซิร์ฟเรียบร้อย (<span class="countdown">5</span>s)
+                </button>
+            </div>
+
+            <div class="panel" id="panel2">
+                <div class="panel-title"><i class="fas fa-route"></i> STEP 2: เข้าเกมปุ๊บ ทำไงต่อ?</div>
+                <p class="instruction-text">
+                    เมื่อคุณกดเชื่อมต่อและโหลดเข้าเซิร์ฟเวอร์เรียบร้อยแล้ว <b>โปรดจำกฎข้อนี้ให้ขึ้นใจ:</b>
+                </p>
+                <div class="alert-zone" style="border-left-color: var(--warning); background: linear-gradient(to right, rgba(251, 191, 36, 0.15), rgba(251, 191, 36, 0.05));">
+                    <ul style="color: #fef3c7;">
+                        <li><b>เกิดมาปุ๊บให้ "เดินตรงไปข้างหน้า" อย่างเดียวเท่านั้น!</b></li>
+                        <li>ไม่ต้องหันรีหันขวาง ให้ก้มดู <b>"ลูกศรที่พื้นถนน"</b></li>
+                        <li>เดินตามถนนและลูกศรไปเรื่อยๆ จะเจอ <b>"เทศบาล"</b> ทันที ไม่มีทางหลง!</li>
+                    </ul>
+                </div>
+                
+                <p class="instruction-text" style="font-size: 0.85rem; color: var(--primary);">🎬 ดูวิดีโอตัวอย่างเส้นทางเดินตรงไปยังเทศบาล:</p>
+                <div class="media-container">
+                    <div class="video-box">
+                       <iframe width="560" height="315" src="https://www.youtube.com/embed/9qUtGZEJrPg?si=202g_sKCrdDrl10r" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+                </div>
+
+                <button class="btn-nav" id="btnNext2" onclick="nextPanel(3)" disabled>
+                    เข้าใจเส้นทางแล้ว เดินตรงอย่างเดียว! (<span class="countdown">5</span>s)
+                </button>
+            </div>
+
+            <div class="panel" id="panel3">
+                <div class="panel-title" style="color: var(--success); border-bottom-color: rgba(52, 211, 153, 0.2);"><i class="fas fa-pen-nib"></i> STEP 3: เขียนคำขอที่ดิน</div>
+                <p class="instruction-text">
+                    เมื่อถึงเทศบาล ให้ไปที่กล่องข้างๆ แท่นอ่าน หยิบสมุดมาเขียน <b>"คำขอที่ดิน"</b> ห้ามเขียนมั่วเด็ดขาด:
+                </p>
+                <div class="highlight-box">
+                    <h5><i class="fas fa-edit"></i> สิ่งที่ต้องเขียนลงในสมุด:</h5>
+                    <p>1. <b>รูปแบบสิ่งก่อสร้าง:</b> จะสร้างอะไร (เช่น บ้านเดี่ยวสไตล์โมเดิร์น, ร้านค้า)<br>
+                       2. <b>ขนาดพื้นที่:</b> ระบุความกว้าง x ยาว ให้ชัดเจน<br>
+                       3. <b>ชื่อในเกม:</b> เช่น stevekub</p>
+                </div>
+                <div class="alert-zone">
+                    <h5 style="margin:0 0 8px 0; color: var(--danger); font-size:1rem;"><i class="fas fa-ban"></i> กฎเหล็ก (ฝ่าฝืน = แบนถาวร)</h5>
+                    <ul>
+                        <li>ห้ามแอบไปสร้างในป่า หรือนอกเขตเมืองเองเด็ดขาด</li>
+                        <li>ห้ามเกรียน ทุบทำลาย หรือก่อกวนพื้นที่ผู้อื่น</li>
+                        <li>จะขอขยายพื้นที่เพิ่มได้ เมื่อสร้างหลังเก่าเสร็จแล้วเท่านั้น</li>
+                    </ul>
+                </div>
+
+                <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-bottom: 15px; font-weight: 300;">เขียนเสร็จแล้วยืนยันเรื่องทิ้งไว้ รอ Admin พาไปเปิดระบบ Claim ให้ครับ</p>
+
+                <button id="playBtn" class="btn-nav btn-play" onclick="magicJoin()">
+                    <i class="fas fa-play-circle"></i> คัดลอก IP & เข้าเกมทันที
+                </button>
+
+                <div style="margin-top: 25px; text-align: center;">
+                    <a href="https://discord.gg/e69s6FrakP" target="_blank" style="color: #818cf8; text-decoration: none; font-size: 0.95rem; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: rgba(129, 140, 248, 0.1); border-radius: 50px; transition: 0.3s;">
+                        <i class="fab fa-discord" style="font-size:1.2rem;"></i> เข้ากลุ่ม Discord ของเมือง
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="full-guide-view" id="fullGuideZone">
+            <h2 style="color: #fff; margin-top: 0; text-align: center; font-size: 1.6rem; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 25px;"><i class="fas fa-book" style="color: var(--primary);"></i> คู่มือฉบับเต็ม</h2>
+            
+            <h3 style="color: var(--primary); font-size: 1.1rem;"><i class="fas fa-plus-square"></i> 1. วิธีเพิ่มเซิร์ฟเวอร์</h3>
+            <p class="instruction-text">เปิดเกมเลือกแผง Servers เลื่อนลงล่างสุดกด Add Server ใส่ข้อมูล:</p>
+            <p class="instruction-text" style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); text-align:center;">
+                <b>Server Address:</b> <span style="color:var(--primary);">147.185.221.223</span><br>
+                <b>Port:</b> <span style="color:var(--primary);">12004</span>
+            </p>
+            <div class="media-container"><img src="1s.jpg" class="tutorial-img"><img src="2s.jpg" class="tutorial-img"><img src="3s.jpg" class="tutorial-img"><img src="4s.jpg" class="tutorial-img"></div>
+
+            <h3 style="color: var(--primary); font-size: 1.1rem; margin-top: 30px;"><i class="fas fa-walking"></i> 2. การเดินทางเข้าสู่เมือง</h3>
+            <div class="alert-zone" style="border-left-color: var(--warning); background: linear-gradient(to right, rgba(251, 191, 36, 0.15), rgba(251, 191, 36, 0.05));">
+                <p style="margin: 0; font-size: 0.95rem; color: #fef3c7; line-height: 1.6;"><b>สำคัญ:</b> เมื่อโหลดเข้าแมพมาได้แล้ว ให้ทำการ <b>"เดินตรงไปข้างหน้าตามลูกศรบนพื้นถนนอย่างเดียว"</b> ห้ามเลี้ยวหรือเดินออกนอกเส้นทางเด็ดขาด จะเจออาคารเทศบาลตั้งอยู่ด้านหน้า</p>
+            </div>
+            <div class="media-container">
+                <div class="video-box">
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/9qUtGZEJrPg?si=202g_sKCrdDrl10r" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <h3 style="color: var(--primary); font-size: 1.1rem; margin-top: 30px;"><i class="fas fa-file-signature"></i> 3. การขอพื้นที่สร้างบ้าน</h3>
+            <p class="instruction-text">เดินเข้าเทศบาล หยิบสมุดในกล่องข้างแท่นอ่านมาเขียนให้ครบถ้วน:</p>
+            <ul class="instruction-text" style="padding-left: 20px;">
+                <li style="margin-bottom: 8px;">ระบุ <b>รูปแบบสิ่งก่อสร้าง</b> ที่ต้องการทำอย่างชัดเจน</li>
+                <li style="margin-bottom: 8px;">ระบุ <b>ขนาดพื้นที่ (กว้าง x ยาว)</b> ที่ต้องการใช้สิทธิ์</li>
+                <li style="margin-bottom: 8px;">ระบุ <b>ชื่อในเกม</b> ให้ชัดเจน</li>
+                <li>เขียนเสร็จแจ้งรอ Admin ตรวจสอบเพื่อตั้งค่าระบบ Claim กันคนเกรียน</li>
+            </ul>
+
+            <h3 style="color: var(--danger); font-size: 1.1rem; margin-top: 30px;"><i class="fas fa-gavel"></i> 4. กฎเหล็กห้ามฝ่าฝืน</h3>
+            <p class="instruction-text" style="color: #fca5a5; background: rgba(239, 68, 68, 0.1); padding: 15px; border-radius: 10px;">ห้ามแอบไปสร้างในป่าหรือนอกเขตเมืองเด็ดขาด, ห้ามทุบทำลายสิ่งก่อสร้างผู้อื่น, และขอขยายพื้นที่เพิ่มได้เมื่อสิ่งก่อสร้างเดิมเสร็จสมบูรณ์แล้วเท่านั้น <b>(ฝ่าฝืนแบนถาวร)</b></p>
+
+            <button class="btn-nav btn-play" onclick="magicJoin()" style="margin-top: 30px;">
+                <i class="fas fa-play-circle"></i> คัดลอก IP & เข้าเกมทันที
+            </button>
+
+            <button class="close-guide-btn" onclick="closeFullGuide()">
+                <i class="fas fa-undo-alt"></i> กลับไปโหมดทีละขั้นตอน
+            </button>
+        </div>
+    </div>
+
+    <div id="toast">📋 คัดลอก IP ให้แล้ว! นำไปวางในเกมได้เลยจ้า</div>
+
+    <script>
+        if (/TikTok/i.test(navigator.userAgent)) {
+            document.getElementById('tiktok-warn').style.display = 'block';
+        }
+
+        const SERVER = { ip: "147.185.221.223", port: 12004, name: "เมืองปิ๊ใหม่" };
+        const totalSteps = 3;
+
+        function startTimer(buttonId, seconds) {
+            const btn = document.getElementById(buttonId);
+            if (!btn) return;
+            const countdownEl = btn.querySelector('.countdown');
+            let timeLeft = seconds;
+
+            const timer = setInterval(() => {
+                timeLeft--;
+                if (countdownEl) countdownEl.innerText = timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    if(buttonId === 'btnNext1') btn.innerHTML = 'รับทราบวิธีใส่ IP แล้ว <i class="fas fa-arrow-right"></i>';
+                    if(buttonId === 'btnNext2') btn.innerHTML = 'จำทางได้แล้ว เดินตรงอย่างเดียว <i class="fas fa-arrow-right"></i>';
+                }
+            }, 1000);
+        }
+
+        window.onload = function() {
+            startTimer('btnNext1', 5);
+        };
+
+        function nextPanel(step) {
+            for(let i = 1; i <= totalSteps; i++) {
+                document.getElementById('panel' + i).classList.remove('active');
+            }
+            document.getElementById('panel' + step).classList.add('active');
+
+            const steps = document.querySelectorAll('.progress-step');
+            steps.forEach((s, idx) => {
+                if (idx < step - 1) {
+                    s.className = 'progress-step completed';
+                    s.innerHTML = '<i class="fas fa-check"></i>';
+                } else if (idx === step - 1) {
+                    s.className = 'progress-step active';
+                    s.innerText = idx + 1;
+                } else {
+                    s.className = 'progress-step';
+                    s.innerText = idx + 1;
+                }
+            });
+
+            const progressPercentage = ((step - 1) / (totalSteps - 1)) * 100;
+            document.getElementById('progressLine').style.width = progressPercentage + '%';
+
+            if (step === 2) {
+                startTimer('btnNext2', 5);
+            }
+        }
+
+        function openFullGuide() {
+            document.getElementById('interactiveMode').style.display = 'none';
+            document.getElementById('fullGuideZone').classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function closeFullGuide() {
+            document.getElementById('fullGuideZone').classList.remove('active');
+            document.getElementById('interactiveMode').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function magicJoin() {
+            navigator.clipboard.writeText(SERVER.ip);
+            const toast = document.getElementById('toast');
+            toast.className = "show";
+
+            setTimeout(() => {
+                const url = `minecraft://?addExternalServer=${encodeURIComponent(SERVER.name)}%7C${SERVER.ip}:${SERVER.port}`;
+                window.location.assign(url);
+                setTimeout(() => { toast.className = ""; }, 4000);
+            }, 600);
+        }
+    </script>
+</body>
+</html>
